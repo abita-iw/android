@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- res/drawable/oval_ripple.xml -->
+    <ripple xmlns:android="http://schemas.android.com/apk/res/android"
+        android:color="?android:colorControlHighlight" tools:targetApi="lollipop">
+        <item>
+            <shape android:shape="oval">
+                <solid android:color="?android:colorAccent"/>
+            </shape>
+        </item>
+    </ripple>
+
+</selector>
