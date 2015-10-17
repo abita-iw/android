@@ -19,7 +19,7 @@
         android:src="@drawable/btn_pin"/>
 
     <ImageButton
-        android:id="@+id/camera_button"
+        android:id="@+id/image_button"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_gravity="end|bottom"
@@ -31,7 +31,7 @@
         android:src="@drawable/btn_camera"/>
 
     <ImageButton
-        android:id="@+id/image_button"
+        android:id="@+id/recenter_button"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_gravity="end|bottom"
@@ -40,7 +40,7 @@
         android:layout_marginRight="20dp"
         android:scaleType="fitCenter"
         android:background="@android:color/transparent"
-        android:src="@drawable/btn_plus"/>
+        android:src="@drawable/btn_gps"/>
 
     <ImageButton
         android:id="@+id/filter_button"

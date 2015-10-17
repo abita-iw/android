@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="15dp">
+
+    <TextView
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Wildlife"
+        android:textColor="#ffffffff"
+        android:background="#fffbbc05"
+        android:padding="15dp"
+        android:layout_margin="5dp"
+        android:textSize="30dp"/>
+
+    <TextView
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Foliage"
+        android:textColor="#ffffffff"
+        android:background="#ff34a853"
+        android:padding="15dp"
+        android:layout_margin="5dp"
+        android:textSize="30dp"/>
+
+    <TextView
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Scenery"
+        android:textColor="#ffffffff"
+        android:background="#ff2c59a3"
+        android:padding="15dp"
+        android:layout_margin="5dp"
+        android:textSize="30dp"/>
+
+    <TextView
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Landmark"
+        android:textColor="#ffffffff"
+        android:background="#ffea4335"
+        android:padding="15dp"
+        android:layout_margin="5dp"
+        android:textSize="30dp"/>
+
+</LinearLayout>

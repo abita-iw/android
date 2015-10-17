@@ -14,6 +14,7 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
@@ -32,6 +33,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -46,6 +48,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        this.findViewById(R.id.pin_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.v("Click", "hey pin was clicked");
+                Dialog dialog = new Dialog(MapsActivity.this);
+                dialog.setTitle("What type of pin is this?");
+
+                // Set the layout view of the dialog
+                dialog.setContentView(R.layout.choose_pin_type);
+
+                // Force size
+                dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                dialog.show();
+            }
+        });
+
+        this.findViewById(R.id.recenter_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getLocation(MapsActivity.this);
+            }
+        });
     }
 
     /**
@@ -159,6 +185,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void updateCoordinates(Location location) {
         LatLng here = new LatLng(location.getLatitude(), location.getLongitude());
         setMarker(this, here);
-        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(here, 19.0f, 0f, 0f)));
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(here, 19.0f, 0f, 0f)));
     }
 }
