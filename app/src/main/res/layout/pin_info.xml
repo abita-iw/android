@@ -9,37 +9,23 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#ff2c59a3">
+        android:background="#fffbbc05">
 
-        <LinearLayout
+        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/PinInfoTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingLeft="15dp"
-            android:paddingTop="15dp"
-            android:paddingRight="15dp">
-
-            <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/PinInfoTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Title"
-                android:textSize="30dp"
-                android:textColor="#ffffffff"/>
-
-            <!--
-                Get the icon of the pin type justified to the right
-            -->
-
-        </LinearLayout>
+            android:padding="10dp"
+            android:text="Title"
+            android:textSize="30dp"
+            android:textColor="#ffffffff"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center"
-            android:paddingTop="15dp"
-            android:paddingBottom="15dp">
+            android:paddingBottom="10dp">
 
             <TextView xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/PinInfoFavorite"
@@ -101,7 +87,7 @@
         android:textSize="20dp"
         android:padding="15dp"
         android:gravity="center"
-        android:background="#ff2c59a3"
+        android:background="#Fffbbc05"
         android:textColor="#ffffffff"/>
 
 

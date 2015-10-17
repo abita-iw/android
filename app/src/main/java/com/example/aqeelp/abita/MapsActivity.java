@@ -3,6 +3,9 @@ package com.example.aqeelp.abita;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -102,9 +105,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
          */
         // Todo: create an entire marker class where data from API can be stored.
         // for now, this will suffice
+
+        // Pin image:
+        // Todo: dynamically set pin image
+        Bitmap fullSizePin = BitmapFactory.decodeResource(getResources(), R.drawable.wildlife_pin);
+        Bitmap smallPin = Bitmap.createScaledBitmap(fullSizePin, 150, 150, false);
+
         mMap.addMarker(new MarkerOptions()
                 .position(loc)
-                .title("Canada Goose"));
+                .title("Canada Goose")
+                .icon(BitmapDescriptorFactory.fromBitmap(smallPin)));
     }
 
     /**
