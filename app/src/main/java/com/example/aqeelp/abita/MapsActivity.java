@@ -1,5 +1,6 @@
 package com.example.aqeelp.abita;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
@@ -10,6 +11,9 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -51,24 +55,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID); // Sets to satellite view w/ road names, etc.
         mMap.getUiSettings().setMapToolbarEnabled(false); // Removes default buttons
-        mMap.setOnMarkerClickListener(new PinClickListener(this)); // Set custom marker click listener
+        mMap.setOnMarkerClickListener(PinClickListener); // Set custom marker click listener
 
         getLocation(this);
     }
 
-    public class PinClickListener implements GoogleMap.OnMarkerClickListener {
-        Context context;
-
-        public PinClickListener(Context context) {
-            this.context = context;
-        }
-
+    private GoogleMap.OnMarkerClickListener PinClickListener = new GoogleMap.OnMarkerClickListener() {
         @Override
         public boolean onMarkerClick(Marker marker) {
-            Toast.makeText(context, marker.getTitle(), Toast.LENGTH_LONG);
-            return false;
+            Log.v("Marker", "Click registers with title " + marker.getTitle());
+
+            Dialog dialog = new Dialog(MapsActivity.this);
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+            // Set the layout view of the dialog
+            dialog.setContentView(R.layout.pin_info);
+
+            // Set title (default previous disabled)
+            TextView text = (TextView) dialog.findViewById(R.id.PinInfoTitle);
+            text.setText(marker.getTitle());
+
+            // Force size
+            dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+
+            dialog.show();
+            return true;
         }
-    }
+    };
 
     /**
      * Sets up the options for the markers on mMap
@@ -81,6 +94,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
          * GoogleMap.setOnMarkerClickListener(OnMarkerClickListener) for maps
          * onMarkerClick(Marker)
          */
+        // Todo: create an entire marker class where data from API can be stored.
+        // for now, this will suffice
         mMap.addMarker(new MarkerOptions()
                 .position(loc)
                 .title("Here you are!"));
