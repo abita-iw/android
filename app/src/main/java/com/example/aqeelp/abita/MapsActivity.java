@@ -13,6 +13,7 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,14 +22,18 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private ArrayList<Marker> markers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +44,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
-
 
     /**
      * Manipulates the map once available.
@@ -61,6 +65,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private GoogleMap.OnMarkerClickListener PinClickListener = new GoogleMap.OnMarkerClickListener() {
+        //Todo: probably make this its own class
         @Override
         public boolean onMarkerClick(Marker marker) {
             Log.v("Marker", "Click registers with title " + marker.getTitle());
@@ -73,10 +78,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             // Set title (default previous disabled)
             TextView text = (TextView) dialog.findViewById(R.id.PinInfoTitle);
-            text.setText(marker.getTitle());
+            //Todo: replace "wildlife" with dynamic pin type
+            text.setText(marker.getTitle() + " - Wildlife");
 
             // Force size
-            dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
             dialog.show();
             return true;
@@ -98,7 +104,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // for now, this will suffice
         mMap.addMarker(new MarkerOptions()
                 .position(loc)
-                .title("Here you are!"));
+                .title("Canada Goose"));
     }
 
     /**
