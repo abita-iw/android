@@ -25,9 +25,7 @@ public class Pin {
     final private LatLng pinLocation;
     final private String pinTitle;
     final private String pinCaption;
-    final private Context context;
-
-    private String PinTypes[] = { "Wildlife", "Foliage", "Scenery", "Landmark" };
+    final private MapsActivity parent;
 
     /**
      * Images:
@@ -35,28 +33,36 @@ public class Pin {
      * - get full bitmap when in close enough range to
      */
 
-    public Pin (int pid, int ptype, LatLng loc, String title, String cap, Context c) {
+    public Pin (int pid, int ptype, LatLng loc, String title, String cap, MapsActivity p) {
         pinId = pid;
         pinType = ptype;
         pinLocation = loc;
         pinTitle = title;
         pinCaption = cap;
-        context = c;
+        Log.v("Test", "got the rest of the metadata");
+        parent = p;
+
+        Log.v("Test", "Made a new pin, pid: "+pid);
     }
 
-    public void show(GoogleMap map, Location currentLocation) {
-        Bitmap fullSizePin = BitmapFactory.decodeResource(context.getResources(), R.drawable.wildlife_pin);
+    public void show(GoogleMap map) {
+        Log.v("Pin", "Showing the pin now");
+        map.setOnMarkerClickListener(PinClickListener); // Set custom marker click listener
+
+        Bitmap fullSizePin = BitmapFactory.decodeResource(parent.getResources(), R.drawable.wildlife_pin);
         Bitmap smallPin = Bitmap.createScaledBitmap(fullSizePin, 150, 150, false);
 
-        LatLng loc = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-
         map.addMarker(new MarkerOptions()
-                .position(loc)
-                .title("Canada Goose")
+                .position(pinLocation)
+                .title(pinId + "")
                 .icon(BitmapDescriptorFactory.fromBitmap(smallPin)));
     }
 
     public int getPinType() {
+        return pinType;
+    }
+
+    public int getPinId() {
         return pinId;
     }
 
@@ -73,23 +79,9 @@ public class Pin {
     }
 
     private GoogleMap.OnMarkerClickListener PinClickListener = new GoogleMap.OnMarkerClickListener() {
-        //Todo: probably make this its own class
         @Override
         public boolean onMarkerClick(Marker marker) {
-            Dialog dialog = new Dialog(context);
-            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-            // Set the layout view of the dialog
-            dialog.setContentView(R.layout.pin_info);
-
-            // Set title (default previous disabled)
-            TextView text = (TextView) dialog.findViewById(R.id.PinInfoTitle);
-            text.setText(marker.getTitle() + " - " + PinTypes[pinType]);
-
-            // Force size
-            dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-
-            dialog.show();
+            parent.loadPinDetail(Integer.parseInt(marker.getTitle()));
             return true;
         }
     };

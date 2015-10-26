@@ -41,6 +41,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private Location lastKnownLoc;
     private ArrayList<Pin> pins;
+    private MapsActivity thisActivity;
+
+    private String PinTypes[] = { "Wildlife", "Foliage", "Scenery", "Landmark" };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,11 +54,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        thisActivity = this;
+
         this.findViewById(R.id.pin_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.v("Click", "hey pin was clicked");
-                Dialog dialog = new Dialog(MapsActivity.this);
+                Log.v("Test", "Pin creation button tapped");
+                getLocation(MapsActivity.this);
+                Log.v("Test", "Updated location");
+                LatLng curLoc = new LatLng(lastKnownLoc.getLatitude(), lastKnownLoc.getLongitude());
+                Log.v("Test", "Parsed location");
+                Pin pin = new Pin(pins.size(), 0, curLoc, "Canada Goose", "", thisActivity);
+                Log.v("Test", "Made a new pin");
+                pins.add(pin);
+                Log.v("Test", "Added pin to the arraylist");
+                pin.show(mMap);
+
+                /*Dialog dialog = new Dialog(MapsActivity.this);
                 dialog.setTitle("What type of pin is this?");
 
                 // Set the layout view of the dialog
@@ -64,7 +79,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // Force size
                 dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
-                dialog.show();
+                dialog.show();*/
             }
         });
 
@@ -91,10 +106,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID); // Sets to satellite view w/ road names, etc.
         mMap.getUiSettings().setMapToolbarEnabled(false); // Removes default buttons
-        mMap.setOnMarkerClickListener(PinClickListener); // Set custom marker click listener
+
+        pins = new ArrayList<Pin>(0);
 
         initLocationServices(this);
         getLocation(this);
+    }
+
+    public void loadPinDetail(int pinId) {
+        Pin pin = findPinById(pinId);
+
+        Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        // Set the layout view of the dialog
+        dialog.setContentView(R.layout.pin_info);
+
+        // Set title (default previous disabled)
+        TextView text = (TextView) dialog.findViewById(R.id.PinInfoTitle);
+        text.setText(pin.getPinTitle() + " - " + PinTypes[pin.getPinType()]);
+
+        // Force size
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        dialog.show();
     }
 
     /**
@@ -178,5 +213,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng here = new LatLng(lastKnownLoc.getLatitude(), lastKnownLoc.getLongitude());
         // setMarker(this, here);
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(here, 19.0f, 0f, 0f)));
+    }
+
+    /**
+     * Brute force, shouldn't need to be better optimized
+     */
+    private Pin findPinById(int id) {
+        for (Pin pin : pins) {
+            if (pin.getPinId() == id)
+                return pin;
+        }
+        return null;
     }
 }
