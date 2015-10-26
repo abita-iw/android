@@ -5,6 +5,7 @@
     android:paddingTop="15dp">
 
     <TextView
+        android:id="@+id/new_pin_is_wildlife"
         android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,6 +17,7 @@
         android:textSize="30dp"/>
 
     <TextView
+        android:id="@+id/new_pin_is_foliage"
         android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,6 +29,7 @@
         android:textSize="30dp"/>
 
     <TextView
+        android:id="@+id/new_pin_is_scenery"
         android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -38,6 +41,7 @@
         android:textSize="30dp"/>
 
     <TextView
+        android:id="@+id/new_pin_is_landmark"
         android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

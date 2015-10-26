@@ -9,6 +9,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/PinInfoHeader"
         android:background="#fffbbc05">
 
         <TextView xmlns:android="http://schemas.android.com/apk/res/android"
