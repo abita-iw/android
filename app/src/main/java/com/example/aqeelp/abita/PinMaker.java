@@ -15,12 +15,12 @@ import com.google.android.gms.maps.model.LatLng;
 public class PinMaker {
     static private MapsActivity parent;
     static private LatLng location;
-    static private int newPinType;
+    static private String newPinType;
     static private String newPinTitle;
     static private String newPinCaption;
 
     public static void makePin(MapsActivity p, Location loc) {
-        newPinType = -1;
+        newPinType = null;
         newPinTitle = null;
         newPinCaption = null;
 
@@ -31,8 +31,8 @@ public class PinMaker {
     }
 
     private static void generatePin() {
-        if (newPinType != -1 && newPinTitle != null && newPinCaption != null) {
-            Pin pin = new Pin((int) (100000 * Math.random()), newPinType, location, newPinTitle, newPinCaption, parent);
+        if (newPinType != null && newPinTitle != null && newPinCaption != null) {
+            Pin pin = new Pin((int) (100000 * Math.random()), newPinType, location, newPinCaption, parent);
             parent.addNewPin(pin);
         }
     }
@@ -57,7 +57,19 @@ public class PinMaker {
             responses[i].setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    newPinType = type;
+                    switch (type) {
+                        case 0:
+                            newPinType = "Wildlife";
+                            break;
+                        case 1:
+                            newPinType = "Foliage";
+                            break;
+                        case 2:
+                            newPinType = "Scenery";
+                            break;
+                        case 3:
+                            newPinType = "Landmark";
+                    }
                     dialog.cancel();
                     specifyPinTitle();
                 }

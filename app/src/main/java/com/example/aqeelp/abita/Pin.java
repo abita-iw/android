@@ -18,21 +18,27 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.Arrays;
+
 /**
  * Created by aqeelp on 10/24/15.
  */
 public class Pin {
-    private String[] PinTypes = { "Wildlife", "Foliage", "Scenery", "Landmark" };
-    private int[] PinColors = { Color.parseColor("fffbbc05"),
-            Color.parseColor("ff34a853"), Color.parseColor("ff2c59a3"),
-            Color.parseColor("ffea4335") };
+    final private String[] PINTYPES = { "Wildlife", "Foliage", "Scenery", "Landmark" };
+    final private int[] PINCOLORS = { Color.parseColor("#fffbbc05"),
+            Color.parseColor("#ff34a853"), Color.parseColor("#ff2c59a3"),
+            Color.parseColor("#ffea4335") };
 
     final private int pinId;
-    final private int pinType;
+    final private String pinType;
+    final private int pinTypeIndex;
     final private LatLng pinLocation;
-    final private String pinTitle;
     final private String pinCaption;
     final private MapsActivity parent;
+
+    private Description[] descriptions;
+    private Bitmap thumbnail;
+    private Bitmap fullSize;
 
     /**
      * Images:
@@ -40,20 +46,25 @@ public class Pin {
      * - get full bitmap when in close enough range to
      */
 
-    public Pin(int pid, int ptype, LatLng loc, String title, String cap, MapsActivity p) {
+    public Pin(int pid, String ptype, LatLng loc, String cap, MapsActivity p) {
         pinId = pid;
         pinType = ptype;
+        pinTypeIndex = Arrays.binarySearch(PINTYPES, pinType);
         pinLocation = loc;
-        pinTitle = title;
         pinCaption = cap;
-        Log.v("Test", "got the rest of the metadata");
         parent = p;
 
-        Log.v("Test", "Made a new pin, pid: "+pid);
+        getDescriptions();
+    }
+
+    private void getDescriptions() {
+        //TODO: async call for the descriptions using the pin id
+        descriptions = new Description[1];
+        descriptions[0] = new Description(0, 0, 0, "Hey! an interesting comment.",
+                "2015-10-21T03:55:06.000Z", "2015-10-21T03:55:06.000Z");
     }
 
     public void show(GoogleMap map) {
-        Log.v("Pin", "Showing the pin now");
         map.setOnMarkerClickListener(PinClickListener); // Set custom marker click listener
 
         Bitmap[] pinIcons = {
@@ -63,7 +74,7 @@ public class Pin {
                 BitmapFactory.decodeResource(parent.getResources(), R.drawable.landmark_pin)
         };
 
-        Bitmap fullSizePin = pinIcons[pinType];
+        Bitmap fullSizePin = pinIcons[pinTypeIndex];
         Bitmap smallPin = Bitmap.createScaledBitmap(fullSizePin, 150, 150, false);
 
         map.addMarker(new MarkerOptions()
@@ -72,8 +83,12 @@ public class Pin {
                 .icon(BitmapDescriptorFactory.fromBitmap(smallPin)));
     }
 
-    public int getPinType() {
+    public String getPinType() {
         return pinType;
+    }
+
+    public int getPinTypeIndex() {
+        return pinTypeIndex;
     }
 
     public int getPinId() {
@@ -82,10 +97,6 @@ public class Pin {
 
     public LatLng getPinLocation() {
         return pinLocation;
-    }
-
-    public String getPinTitle() {
-        return pinTitle;
     }
 
     public String getPinCaption() {
@@ -111,16 +122,17 @@ public class Pin {
 
                 // Set title (default previous disabled)
                 TextView titleView = (TextView) dialog.findViewById(R.id.PinInfoTitle);
-                String title = pin.getPinTitle() + " - " + PinTypes[pin.getPinType()];
+                String title = pin.getPinCaption() + " - " + PINTYPES[pin.getPinTypeIndex()];
                 titleView.setText(title);
 
                 View header = dialog.findViewById(R.id.PinInfoHeader);
                 View readMore = dialog.findViewById(R.id.PinInfoReadMore);
-                header.setBackgroundColor(PinColors[pin.getPinType()]);
-                readMore.setBackgroundColor(PinColors[pin.getPinType()]);
+                header.setBackgroundColor(PINCOLORS[pin.getPinTypeIndex()]);
+                readMore.setBackgroundColor(PINCOLORS[pin.getPinTypeIndex()]);
 
-                TextView caption = (TextView) dialog.findViewById(R.id.PinInfoBody);
-                caption.setText(pin.getPinCaption());
+                //TODO: fill section wtih descriptions
+                //TextView caption = (TextView) dialog.findViewById(R.id.PinInfoBody);
+                //caption.setText(pin.getPinCaption());
 
                 // Force size
                 dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
