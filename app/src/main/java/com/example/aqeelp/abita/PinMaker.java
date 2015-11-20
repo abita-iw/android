@@ -32,7 +32,7 @@ public class PinMaker {
 
     private static void generatePin() {
         if (newPinType != null && newPinTitle != null && newPinCaption != null) {
-            Pin pin = new Pin((int) (100000 * Math.random()), newPinType, location, newPinCaption, parent);
+            Pin pin = new Pin((int) (100000 * Math.random()), newPinType, location, newPinTitle, newPinCaption, parent);
             parent.addNewPin(pin);
         }
     }
@@ -95,16 +95,16 @@ public class PinMaker {
                 EditText title_field = (EditText) dialog.findViewById(R.id.new_pin_title);
                 newPinTitle = title_field.getText().toString();
                 dialog.cancel();
-                specifyPinCaption();
+                specifyPinDescription();
             }
         });
 
         dialog.show();
     }
 
-    private static void specifyPinCaption() {
+    private static void specifyPinDescription() {
         final Dialog dialog = new Dialog(parent);
-        dialog.setTitle("Give this pin a caption:");
+        dialog.setTitle("Give this pin a longer description:");
 
         // Set the layout view of the dialog
         dialog.setContentView(R.layout.specify_pin_caption);

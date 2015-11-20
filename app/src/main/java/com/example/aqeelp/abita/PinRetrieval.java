@@ -18,7 +18,16 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.X509TrustManager;
 
 /**
  * Created by aqeelp on 11/10/15.
@@ -29,6 +38,7 @@ public class PinRetrieval extends AsyncTask<String, Void, String> {
     public PinRetrieval(MapsActivity m) {
         Log.v("Async_task", "Instantiated");
         mapsActivity = m;
+        trustEveryone();
     }
 
     @Override
@@ -44,6 +54,7 @@ public class PinRetrieval extends AsyncTask<String, Void, String> {
 
     protected void onPostExecute(String data) {
         Log.v("Async_task", "On Post Execute - Attempting to create pins from data");
+        Log.v("Async_task", data);
         try {
             Pin[] pinsRetrieved = parseData(data);
             mapsActivity.clearPins();
@@ -58,32 +69,32 @@ public class PinRetrieval extends AsyncTask<String, Void, String> {
     private Pin[] parseData(String data) throws JSONException {
         try {
             // getting JSON string from URL
+            Log.v("Async task", "Line 72");
             JSONArray pinsRawJSON = new JSONArray(data);
+            Log.v("Async task", "Line 74");
             Pin[] pins = new Pin[pinsRawJSON.length()];
 
             for (int i = 0; i < pinsRawJSON.length(); i++) {
+                Log.v("Async task", "Line 78, i = "+i);
                 JSONObject pin = pinsRawJSON.getJSONObject(i);
                 int pinId = pin.getInt("pinId");
                 int userId = pin.getInt("userId");
                 String pinType = pin.getString("pinType");
-                String caption = pin.getString("caption");
+                String title = pin.getString("title");
                 double latitude = pin.getDouble("latitude");
                 double longitude = pin.getDouble("longitude");
                 String dateCreated = pin.getString("dateCreated");
                 String dateModified = pin.getString("dateModified");
 
-                // TODO: temporary for pins without real locations
-                Location location = mapsActivity.getMostRecentLocation();
-
+                Log.v("Async task", "Line 92");
                 pins[i] = new Pin(pinId, pinType,
-                        new LatLng(location.getLatitude() + (Math.random() * 0.006),
-                                location.getLongitude() + (Math.random() * 0.006)),
-                        caption, mapsActivity);
+                        new LatLng(latitude, longitude), title, "", mapsActivity);
+                Log.v("Async task", "Line 96");
             }
 
             return pins;
         } catch (Exception e) {
-            Log.v("Async task", "On Post Execute - Failed to parse JSON properly");
+            Log.v("Async task", "Parse Data - Failed to parse JSON properly");
         }
         return null;
     }
@@ -107,5 +118,28 @@ public class PinRetrieval extends AsyncTask<String, Void, String> {
             out.write(buffer, 0, count);
         }
         return out.toByteArray();
+    }
+
+    private void trustEveryone() {
+        try {
+            HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            });
+            SSLContext context = SSLContext.getInstance("TLS");
+            context.init(null, new X509TrustManager[]{new X509TrustManager(){
+                public void checkClientTrusted(X509Certificate[] chain,
+                                               String authType) throws CertificateException {}
+                public void checkServerTrusted(X509Certificate[] chain,
+                                               String authType) throws CertificateException {}
+                public X509Certificate[] getAcceptedIssuers() {
+                    return new X509Certificate[0];
+                }}}, new SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(
+                    context.getSocketFactory());
+        } catch (Exception e) { // should never happen
+            e.printStackTrace();
+        }
     }
 }

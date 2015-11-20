@@ -91,6 +91,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         initLocationServices(this);
         getLocation(this);
+
         PinRetrieval pinGetter = new PinRetrieval(thisActivity);
         pinGetter.execute("https://www.abitatech.net:5000/api/pins/");
     }
