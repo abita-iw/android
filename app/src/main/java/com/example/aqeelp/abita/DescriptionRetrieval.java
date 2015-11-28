@@ -2,7 +2,6 @@ package com.example.aqeelp.abita;
 
 import android.os.AsyncTask;
 import android.util.JsonReader;
-import android.util.JsonToken;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -15,7 +14,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -30,12 +28,12 @@ import javax.net.ssl.X509TrustManager;
 /**
  * Created by aqeelp on 11/10/15.
  */
-public class PinRetrieval extends AsyncTask<String, Void, String> {
-    private MapsActivity mapsActivity;
+public class DescriptionRetrieval extends AsyncTask<String, Void, String> {
+    private Pin pin;
 
-    public PinRetrieval(MapsActivity m) {
+    public DescriptionRetrieval(Pin p) {
         Log.v("Async_task", "Instantiated");
-        mapsActivity = m;
+        pin = p;
         trustEveryone();
     }
 
@@ -55,31 +53,29 @@ public class PinRetrieval extends AsyncTask<String, Void, String> {
         Log.v("Async_task", data);
         try {
             InputStream stream = new ByteArrayInputStream(data.getBytes("UTF-8"));
-            ArrayList<Pin> pinsRetrieved = readJsonStream(stream);
+            ArrayList<Description> descriptionsRetrieved = readJsonStream(stream);
             //mapsActivity.clearPins();
-            for (int i = 0; i < pinsRetrieved.size(); i++) {
-                mapsActivity.addNewPin(pinsRetrieved.get(i));
-            }
+            pin.setPinDescriptions((Description[]) descriptionsRetrieved.toArray());
         } catch (IOException e) {
             Log.v("Async_task", "On Post Execute - Failed to parse JSON properly");
         }
     }
 
-    public ArrayList<Pin> readJsonStream(InputStream in) throws IOException {
+    public ArrayList<Description> readJsonStream(InputStream in) throws IOException {
         JsonReader reader = new JsonReader(new InputStreamReader(in, "UTF-8"));
-        ArrayList<Pin> pins = null;
+        ArrayList<Description> descriptions = null;
         try {
-            pins = readMessagesArray(reader);
+            descriptions = readMessagesArray(reader);
         } catch (Exception e) {
             Log.v("Async_task", "Read JSON Stream - Failed");
         } finally {
             reader.close();
-            return pins;
+            return descriptions;
         }
     }
 
-    public ArrayList<Pin> readMessagesArray(JsonReader reader) throws IOException {
-        ArrayList<Pin> messages = new ArrayList<Pin>();
+    public ArrayList<Description> readMessagesArray(JsonReader reader) throws IOException {
+        ArrayList<Description> messages = new ArrayList<Description>();
 
         reader.beginArray();
         while (reader.hasNext()) {
@@ -89,41 +85,33 @@ public class PinRetrieval extends AsyncTask<String, Void, String> {
         return messages;
     }
 
-    public Pin readMessage(JsonReader reader) throws IOException {
-        int pinId = -1;
+    public Description readMessage(JsonReader reader) throws IOException {
+        int descriptionId = -1;
         int userId = -1;
-        String pinType = null;
-        String title = null;
-        double latitude = 0.0;
-        double longitude = 0.0;
-        String dateCreated = null;
-        String dateModified = null;
+        int pinId = pin.getPinId();
+        String text = null;
+        String createdAt = null;
+        String modifiedAt = null;
 
         reader.beginObject();
         while (reader.hasNext()) {
             String name = reader.nextName();
-            if (name.equals("pinId")) {
-                pinId = reader.nextInt();
+            if (name.equals("descriptionId")) {
+                descriptionId = reader.nextInt();
             } else if (name.equals("userId")) {
                 userId = reader.nextInt();
-            } else if (name.equals("pinType")) {
-                pinType = reader.nextString();
-            } else if (name.equals("title")) {
-                title = reader.nextString();
-            } else if (name.equals("latitude")) {
-                latitude = reader.nextDouble();
-            } else if (name.equals("longitude")) {
-                longitude = reader.nextDouble();
+            } else if (name.equals("text")) {
+                text = reader.nextString();
             } else if (name.equals("dateCreated")) {
-                dateCreated = reader.nextString();
+                createdAt = reader.nextString();
             } else if (name.equals("dateModified")) {
-                dateModified = reader.nextString();
+                modifiedAt = reader.nextString();
             }
         }
         reader.endObject();
 
-        return new Pin(pinId, pinType,
-                new LatLng(latitude, longitude), title, mapsActivity);
+        return new Description(descriptionId, userId, pinId,
+                text, createdAt, modifiedAt);
     }
 
     /*private Pin[] parseData(String data) throws JSONException {

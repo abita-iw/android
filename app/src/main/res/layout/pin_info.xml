@@ -70,15 +70,13 @@
         android:cropToPadding="true"
         android:src="@drawable/goose_example"/>
 
-    <TextView
-        android:id="@+id/PinInfoBody"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="15dp"
-        android:paddingRight="15dp"
-        android:paddingBottom="15dp"
-        android:text="The Canada goose (Branta canadensis) is a large wild goose species with a black head and neck, white patches on the face, and a brown body. Native to arctic and temperate regions of North America, its migration occasionally reaches northern Europe. It has been introduced to Britain, New Zealand, Argentina, Chile, and the Falkland Islands.[2] Like most geese, the Canada goose is primarily herbivorous and normally migratory; it tends to be found on or close to fresh water."
-        />
+        android:background="#ffffffff"
+        android:id="@+id/pin_description_section">
+    </LinearLayout>
 
     <TextView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/PinInfoReadMore"

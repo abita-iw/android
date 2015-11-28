@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -37,10 +38,11 @@ public class Pin {
     final private int pinTypeIndex;
     final private LatLng pinLocation;
     final private String pinTitle;
-    final private String pinDescription;
     final private MapsActivity parent;
 
-    private Description[] descriptions;
+    private Description[] pinDescriptions;
+    private User pinUser;
+
     private Bitmap thumbnail;
     private Bitmap fullSize;
 
@@ -50,23 +52,13 @@ public class Pin {
      * - get full bitmap when in close enough range to
      */
 
-    public Pin(int pid, String ptype, LatLng loc, String ti, String desc, MapsActivity p) {
+    public Pin(int pid, String ptype, LatLng loc, String ti, MapsActivity p) {
         pinId = pid;
         pinType = ptype;
         pinTypeIndex = PINTYPES.indexOf(pinType);
         pinLocation = loc;
         pinTitle = ti;
-        pinDescription = desc;
         parent = p;
-
-        getDescriptions();
-    }
-
-    private void getDescriptions() {
-        //TODO: async call for the descriptions using the pin id
-        descriptions = new Description[1];
-        descriptions[0] = new Description(0, 0, 0, "Hey! an interesting comment.",
-                "2015-10-21T03:55:06.000Z", "2015-10-21T03:55:06.000Z");
     }
 
     public void show(GoogleMap map) {
@@ -86,6 +78,19 @@ public class Pin {
                 .position(pinLocation)
                 .title(pinId + "")
                 .icon(BitmapDescriptorFactory.fromBitmap(smallPin)));
+    }
+
+    public void fetchDescriptions() {
+        DescriptionRetrieval descGetter = new DescriptionRetrieval((Pin) this);
+        descGetter.execute("https://www.abitatech.net:5000/api/pins/26/descriptions");
+    }
+
+    public void setPinDescriptions(Description[] descriptions) {
+        pinDescriptions = new Description[descriptions.length];
+        for (int i = 0; i < descriptions.length; i++) {
+            // Make a defensive copy of all descriptions?
+            pinDescriptions[i] = descriptions[i];
+        }
     }
 
     public String getPinType() {
@@ -108,12 +113,16 @@ public class Pin {
         return pinTitle;
     }
 
-    public String getPinDescription() {
-        return pinDescription;
+    public Description[] getPinDescriptions() {
+        return pinDescriptions;
     }
 
     public String toString() {
         return "Pin! Title: " + getPinTitle() + " Location: " + getPinLocation();
+    }
+
+    public MapsActivity getParent() {
+        return parent;
     }
 
     /**
@@ -144,8 +153,14 @@ public class Pin {
                 readMore.setBackgroundColor(PINCOLORS[pin.getPinTypeIndex()]);
 
                 //TODO: fill section wtih descriptions
-                TextView caption = (TextView) dialog.findViewById(R.id.PinInfoBody);
-                caption.setText(pin.getPinDescription());
+                LinearLayout descriptionSection = (LinearLayout)
+                        dialog.findViewById(R.id.pin_description_section);
+                Description[] descs = pin.getPinDescriptions();
+                for (int i = 0; i < descs.length; i++) {
+                    Context context = pin.getParent().getApplicationContext();
+                    DescriptionView descriptionView = new DescriptionView(context, descs[i]);
+                    descriptionSection.addView(descriptionView.getView());
+                }
 
                 // Force size
                 dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);

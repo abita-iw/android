@@ -176,12 +176,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // Todo: paint a little icon on the current location
     private void updateCoordinates() {
         LatLng here = new LatLng(lastKnownLoc.getLatitude(), lastKnownLoc.getLongitude());
+
+        // Todo: change this to be pins in a range
+        PinRetrieval pinGetter = new PinRetrieval(thisActivity);
+        pinGetter.execute("https://www.abitatech.net:5000/api/pins/");
+
         // setMarker(this, here);
+
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(here, 19.0f, 0f, 0f)));
     }
 
     // Todo: change this to verify that the pin isn't already in the list
     public void addNewPin(Pin pin) {
+        if (findPinById(pin.getPinId()) != null) return;
         pins.add(pin);
         pin.show(mMap);
         Log.v("MapsActivity", pin.toString());
