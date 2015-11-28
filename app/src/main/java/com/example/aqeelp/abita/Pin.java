@@ -34,6 +34,7 @@ public class Pin {
             Color.parseColor("#ffea4335") };
 
     final private int pinId;
+    final private int userId;
     final private String pinType;
     final private int pinTypeIndex;
     final private LatLng pinLocation;
@@ -52,8 +53,9 @@ public class Pin {
      * - get full bitmap when in close enough range to
      */
 
-    public Pin(int pid, String ptype, LatLng loc, String ti, MapsActivity p) {
+    public Pin(int pid, int uid, String ptype, LatLng loc, String ti, MapsActivity p) {
         pinId = pid;
+        userId = uid;
         pinType = ptype;
         pinTypeIndex = PINTYPES.indexOf(pinType);
         pinLocation = loc;
@@ -93,6 +95,20 @@ public class Pin {
         }
     }
 
+    public void fetchUser() {
+        UserRetrieval userGetter = new UserRetrieval((Pin) this);
+        userGetter.execute("https://www.abitatech.net:5000/api/users/"+userId);
+    }
+
+    public void setPinUser(User user) {
+        // Defensive copy? probably not
+        this.pinUser = user;
+        parent.addNewUser(user);
+    }
+
+    /**
+     * Getter and setter methods follow:
+     */
     public String getPinType() {
         return pinType;
     }
@@ -103,6 +119,10 @@ public class Pin {
 
     public int getPinId() {
         return pinId;
+    }
+
+    public int getUserId() {
+        return userId;
     }
 
     public LatLng getPinLocation() {

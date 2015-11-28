@@ -41,6 +41,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private Location lastKnownLoc;
     private ArrayList<Pin> pins;
+    private ArrayList<User> users;
     private MapsActivity thisActivity;
 
     private String PinTypes[] = { "Wildlife", "Foliage", "Scenery", "Landmark" };
@@ -191,7 +192,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (findPinById(pin.getPinId()) != null) return;
         pins.add(pin);
         pin.show(mMap);
-        Log.v("MapsActivity", pin.toString());
+    }
+
+    public void addNewUser(User user) {
+        if (findUserById(user.getUserId()) != null) return;
+        users.add(user);
     }
 
     // Todo: hopefully won't need this for long
@@ -210,6 +215,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         for (Pin pin : pins) {
             if (pin.getPinId() == id)
                 return pin;
+        }
+        return null;
+    }
+
+    public User findUserById(int id) {
+        for (User user : users) {
+            if (user.getUserId() == id)
+                return user;
         }
         return null;
     }
