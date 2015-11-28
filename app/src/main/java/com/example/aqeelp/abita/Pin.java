@@ -25,7 +25,7 @@ import java.util.Arrays;
  * Created by aqeelp on 10/24/15.
  */
 public class Pin {
-    final private String[] PINTYPESTRINGS = { "Wildlife", "Foliage", "Scenery", "Landmark" };
+    final private String[] PINTYPESTRINGS = { "Wildlife", "Foliage", "Scenery", "Architecture" };
     final private ArrayList<String> PINTYPES =
             new ArrayList<String>(Arrays.asList(PINTYPESTRINGS));
     final private int[] PINCOLORS = { Color.parseColor("#fffbbc05"),
@@ -110,6 +110,10 @@ public class Pin {
 
     public String getPinDescription() {
         return pinDescription;
+    }
+
+    public String toString() {
+        return "Pin! Title: " + getPinTitle() + " Location: " + getPinLocation();
     }
 
     /**
