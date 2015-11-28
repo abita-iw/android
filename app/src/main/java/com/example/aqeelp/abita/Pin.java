@@ -33,6 +33,7 @@ public class Pin {
             Color.parseColor("#ff34a853"), Color.parseColor("#ff2c59a3"),
             Color.parseColor("#ffea4335") };
 
+    // Static attributes, received on creation:
     final private int pinId;
     final private int userId;
     final private String pinType;
@@ -41,9 +42,9 @@ public class Pin {
     final private String pinTitle;
     final private MapsActivity parent;
 
+    // Attributes pulled as needed:
     private Description[] pinDescriptions;
     private User pinUser;
-
     private Bitmap thumbnail;
     private Bitmap fullSize;
 
@@ -84,7 +85,7 @@ public class Pin {
 
     public void fetchDescriptions() {
         DescriptionRetrieval descGetter = new DescriptionRetrieval((Pin) this);
-        descGetter.execute("https://www.abitatech.net:5000/api/pins/26/descriptions");
+        descGetter.execute("https://www.abitatech.net:5000/api/pins/" + pinId + "/descriptions");
     }
 
     public void setPinDescriptions(Description[] descriptions) {
@@ -97,7 +98,7 @@ public class Pin {
 
     public void fetchUser() {
         UserRetrieval userGetter = new UserRetrieval((Pin) this);
-        userGetter.execute("https://www.abitatech.net:5000/api/users/"+userId);
+        userGetter.execute("https://www.abitatech.net:5000/api/users/" + userId);
     }
 
     public void setPinUser(User user) {
@@ -172,7 +173,7 @@ public class Pin {
                 header.setBackgroundColor(PINCOLORS[pin.getPinTypeIndex()]);
                 readMore.setBackgroundColor(PINCOLORS[pin.getPinTypeIndex()]);
 
-                //TODO: fill section wtih descriptions
+                //TODO: fill section with descriptions
                 LinearLayout descriptionSection = (LinearLayout)
                         dialog.findViewById(R.id.pin_description_section);
                 Description[] descs = pin.getPinDescriptions();
