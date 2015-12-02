@@ -1,5 +1,7 @@
 package com.example.aqeelp.abita;
 
+import android.util.Log;
+
 /**
  * Created by aqeelp on 11/10/15.
  */
@@ -13,6 +15,8 @@ public class User {
         userId = uId;
         email = e;
         displayName = n;
+
+        Log.v("Creation", this.toString());
     }
 
     public int getUserId() {
@@ -25,5 +29,9 @@ public class User {
 
     public String getDisplayName() {
         return displayName;
+    }
+
+    public String toString() {
+        return "User! ID: " + userId + " Email: " + email;
     }
 }

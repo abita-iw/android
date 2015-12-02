@@ -32,7 +32,8 @@ public class PinMaker {
 
     private static void generatePin() {
         if (newPinType != null && newPinTitle != null && newPinCaption != null) {
-            Pin pin = new Pin((int) (100000 * Math.random()), newPinType, location, newPinTitle, newPinCaption, parent);
+            Pin pin = new Pin((int) (100000 * Math.random()), 26, newPinType, location,
+                    newPinTitle, parent);
             parent.addNewPin(pin);
         }
     }
@@ -68,7 +69,7 @@ public class PinMaker {
                             newPinType = "Scenery";
                             break;
                         case 3:
-                            newPinType = "Landmark";
+                            newPinType = "Architecture";
                     }
                     dialog.cancel();
                     specifyPinTitle();

@@ -1,5 +1,7 @@
 package com.example.aqeelp.abita;
 
+import android.util.Log;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -30,7 +32,10 @@ public class Description {
         user = null;
 
         setDates(dateCreated, dateModified);
-        findUserFromId(userId);
+
+        //fetchUser();
+
+        Log.v("Creation", this.toString());
     }
 
     private void setDates(String dateCreated, String dateModified) {
@@ -48,9 +53,17 @@ public class Description {
         }
     }
 
-    private void findUserFromId(int uId) {
-        // TODO: actually implement with async call made as needed
-        user = new User(uId);
+    private void fetchUser() {
+        UserRetrieval userGetter = new UserRetrieval(null, (Description) this);
+        userGetter.execute("https://www.abitatech.net:5000/api/users/" + userId);
+    }
+
+    public void setPinUser(User user) {
+        this.user = user;
+    }
+
+    public void setDescriptionUser(User u) {
+        user = u;
     }
 
     public int getDescriptionId() {
@@ -79,5 +92,9 @@ public class Description {
 
     public User getUser() {
         return user;
+    }
+
+    public String toString() {
+        return "Description! ID: " + descriptionId + " Message: " + text;
     }
 }

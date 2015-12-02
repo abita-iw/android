@@ -34,7 +34,7 @@ public class PinRetrieval extends AsyncTask<String, Void, String> {
     private MapsActivity mapsActivity;
 
     public PinRetrieval(MapsActivity m) {
-        Log.v("Async_task", "Instantiated");
+        Log.v("Async_task", "Instantiated unbounded pin retrieval");
         mapsActivity = m;
         trustEveryone();
     }

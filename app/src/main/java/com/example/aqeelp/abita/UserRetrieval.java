@@ -28,16 +28,26 @@ import javax.net.ssl.X509TrustManager;
  */
 public class UserRetrieval extends AsyncTask<String, Void, String> {
     private Pin pin;
+    private Description description;
+    private boolean pinCalled;
 
-    public UserRetrieval(Pin p) {
-        Log.v("Async_task", "Instantiated");
-        pin = p;
+    public UserRetrieval(Pin p, Description d) {
+        if (p != null) {
+            pin = p;
+            Log.v("Async_task", "Instantiated user retrieval for pin " + p.getPinId());
+            pinCalled = true;
+        } else {
+            description = d;
+            Log.v("Async_task", "Instantiated user retrieval for description " + d.getDescriptionId());
+            pinCalled = false;
+        }
+
         trustEveryone();
     }
 
     @Override
     protected String doInBackground(String... params) {
-        Log.v("Async_task", "Do in background - Attempting to get data url");
+        Log.v("Async_task", "Do in background - Attempting to get data url " + params[0]);
         try {
             return get(new URL(params[0]));
         } catch (Exception e) {
@@ -52,8 +62,10 @@ public class UserRetrieval extends AsyncTask<String, Void, String> {
         try {
             InputStream stream = new ByteArrayInputStream(data.getBytes("UTF-8"));
             User userReceived = readJsonStream(stream);
-            //mapsActivity.clearPins();
-            pin.setPinUser(userReceived);
+            if (pinCalled)
+                pin.setPinUser(userReceived);
+            else
+                description.setDescriptionUser(userReceived);
         } catch (IOException e) {
             Log.v("Async_task", "On Post Execute - Failed to parse JSON properly");
         }
@@ -89,39 +101,6 @@ public class UserRetrieval extends AsyncTask<String, Void, String> {
 
         return new User(userId, email, email);
     }
-
-    /*private Pin[] parseData(String data) throws JSONException {
-        try {
-            // getting JSON string from URL
-            Log.v("Async task", "Line 72");
-            JSONArray pinsRawJSON = new JSONArray(data);
-            Log.v("Async task", "Line 74");
-            Pin[] pins = new Pin[pinsRawJSON.length()];
-
-            for (int i = 0; i < pinsRawJSON.length(); i++) {
-                Log.v("Async task", "Line 78, i = "+i);
-                JSONObject pin = pinsRawJSON.getJSONObject(i);
-                int pinId = pin.getInt("pinId");
-                int userId = pin.getInt("userId");
-                String pinType = pin.getString("pinType");
-                String title = pin.getString("title");
-                double latitude = pin.getDouble("latitude");
-                double longitude = pin.getDouble("longitude");
-                String dateCreated = pin.getString("dateCreated");
-                String dateModified = pin.getString("dateModified");
-
-                Log.v("Async task", "Line 92");
-                pins[i] = new Pin(pinId, pinType,
-                        new LatLng(latitude, longitude), title, "", mapsActivity);
-                Log.v("Async task", "Line 96");
-            }
-
-            return pins;
-        } catch (Exception e) {
-            Log.v("Async task", "Parse Data - Failed to parse JSON properly");
-        }
-        return null;
-    }*/
 
     private String get(URL url) throws IOException {
         URLConnection urlConnection = url.openConnection();

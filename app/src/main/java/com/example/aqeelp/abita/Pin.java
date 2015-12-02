@@ -62,6 +62,11 @@ public class Pin {
         pinLocation = loc;
         pinTitle = ti;
         parent = p;
+
+        fetchDescriptions();
+        fetchUser();
+
+        Log.v("Creation", this.toString());
     }
 
     public void show(GoogleMap map) {
@@ -97,7 +102,7 @@ public class Pin {
     }
 
     public void fetchUser() {
-        UserRetrieval userGetter = new UserRetrieval((Pin) this);
+        UserRetrieval userGetter = new UserRetrieval((Pin) this, null);
         userGetter.execute("https://www.abitatech.net:5000/api/users/" + userId);
     }
 

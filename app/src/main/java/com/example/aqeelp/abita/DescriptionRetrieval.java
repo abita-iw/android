@@ -32,7 +32,7 @@ public class DescriptionRetrieval extends AsyncTask<String, Void, String> {
     private Pin pin;
 
     public DescriptionRetrieval(Pin p) {
-        Log.v("Async_task", "Instantiated");
+        Log.v("Async_task", "Instantiated description retrieval for pin " + p.getPinId());
         pin = p;
         trustEveryone();
     }
@@ -54,7 +54,6 @@ public class DescriptionRetrieval extends AsyncTask<String, Void, String> {
         try {
             InputStream stream = new ByteArrayInputStream(data.getBytes("UTF-8"));
             ArrayList<Description> descriptionsRetrieved = readJsonStream(stream);
-            //mapsActivity.clearPins();
             pin.setPinDescriptions((Description[]) descriptionsRetrieved.toArray());
         } catch (IOException e) {
             Log.v("Async_task", "On Post Execute - Failed to parse JSON properly");
@@ -100,6 +99,8 @@ public class DescriptionRetrieval extends AsyncTask<String, Void, String> {
                 descriptionId = reader.nextInt();
             } else if (name.equals("userId")) {
                 userId = reader.nextInt();
+            } else if (name.equals("pinId")) {
+                pinId = reader.nextInt();
             } else if (name.equals("text")) {
                 text = reader.nextString();
             } else if (name.equals("dateCreated")) {
