@@ -184,7 +184,7 @@ public class PinRetrieval extends AsyncTask<String, Void, String> {
         reader.endObject();
 
         return new Description(descriptionId, userId, pinId,
-                text, createdAt, modifiedAt);
+                text, createdAt, modifiedAt, mapsActivity);
     }
 
     private String get(URL url) throws IOException {

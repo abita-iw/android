@@ -216,8 +216,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return lastKnownLoc;
     }
 
+    public void addNewPin(Pin pin) {
+        pinsInRange.put(pin.getPinId(), pin);
+    }
+
     // Accessor and setter methods for Pin and User hashmaps:
-    public void addNewPin(List<Pin> pins) {
+    public void addNewPins(List<Pin> pins) {
         for (Pin pin : pins) {
             if (pinsOutOfRange.containsKey(pin.getPinId())) return; // avoid duplicates
             if (pinsInRange.containsKey(pin.getPinId())) return; // avoid duplicates

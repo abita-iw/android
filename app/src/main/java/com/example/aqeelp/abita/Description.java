@@ -16,17 +16,20 @@ public class Description {
     final private int userId;
     final private int pinId;
     final private String text;
+    final private MapsActivity activity;
 
     private User user;
     private Date createdAt;
     private Date modifiedAt;
 
     public Description(int dId, int uId, int pId, String t, String dateCreated,
-                       String dateModified) {
+                       String dateModified, MapsActivity m) {
         descriptionId = dId;
         userId = uId;
         pinId = pId;
         text = t;
+        activity = m;
+
         createdAt = null;
         modifiedAt = null;
         user = null;
@@ -53,8 +56,8 @@ public class Description {
         }
     }
 
-    private void fetchUser() {
-        UserRetrieval userGetter = new UserRetrieval(null, (Description) this);
+    public void fetchUser() {
+        UserRetrieval userGetter = new UserRetrieval(null, (Description) this, activity);
         userGetter.execute("https://www.abitatech.net:5000/api/users/" + userId);
     }
 

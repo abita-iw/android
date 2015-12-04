@@ -29,9 +29,12 @@ import javax.net.ssl.X509TrustManager;
 public class UserRetrieval extends AsyncTask<String, Void, String> {
     private Pin pin;
     private Description description;
+    private MapsActivity activity;
     private boolean pinCalled;
 
-    public UserRetrieval(Pin p, Description d) {
+    public UserRetrieval(Pin p, Description d, MapsActivity m) {
+        activity = m;
+
         if (p != null) {
             pin = p;
             Log.v("Async_task", "Instantiated user retrieval for pin " + p.getPinId());
@@ -47,6 +50,7 @@ public class UserRetrieval extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... params) {
+        // TODO: don't add User if already found
         Log.v("Async_task", "Do in background - Attempting to get data url " + params[0]);
         try {
             return get(new URL(params[0]));
@@ -66,6 +70,7 @@ public class UserRetrieval extends AsyncTask<String, Void, String> {
                 pin.setPinUser(userReceived);
             else
                 description.setDescriptionUser(userReceived);
+            activity.addNewUser(userReceived);
         } catch (IOException e) {
             Log.v("Async_task", "On Post Execute - Failed to parse JSON properly");
         }

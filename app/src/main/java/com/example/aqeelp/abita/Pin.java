@@ -102,7 +102,7 @@ public class Pin {
         if (!override)
             if (pinDescriptions != null)
                 return;
-        DescriptionRetrieval descGetter = new DescriptionRetrieval((Pin) this);
+        DescriptionRetrieval descGetter = new DescriptionRetrieval((Pin) this, parent);
         descGetter.execute("https://www.abitatech.net:5000/api/pins/" + pinId + "/descriptions");
     }
 
@@ -122,7 +122,7 @@ public class Pin {
         if (!override)
             if (pinUser != null)
                 return;
-        UserRetrieval userGetter = new UserRetrieval((Pin) this, null);
+        UserRetrieval userGetter = new UserRetrieval((Pin) this, null, parent);
         userGetter.execute("https://www.abitatech.net:5000/api/users/" + userId);
     }
 
