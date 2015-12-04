@@ -77,7 +77,7 @@ public class UserRetrieval extends AsyncTask<String, Void, String> {
         try {
             user = readMessage(reader);
         } catch (Exception e) {
-            Log.v("Async_task", "Read JSON Stream - Failed");
+            Log.v("Async_task", "User: Read JSON Stream Failed");
         } finally {
             reader.close();
             return user;

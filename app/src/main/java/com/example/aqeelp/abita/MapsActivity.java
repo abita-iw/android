@@ -34,14 +34,18 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private Location lastKnownLoc;
-    private ArrayList<Pin> pins;
-    private ArrayList<User> users;
+    private Location lastQueryLoc;
+    private HashMap<Integer, Pin> pinsInRange;
+    private HashMap<Integer, Pin> pinsOutOfRange;
+    private HashMap<Integer, User> users;
     private MapsActivity thisActivity;
 
     private String PinTypes[] = { "Wildlife", "Foliage", "Scenery", "Landmark" };
@@ -88,13 +92,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID); // Sets to satellite view w/ road names, etc.
         mMap.getUiSettings().setMapToolbarEnabled(false); // Removes default buttons
 
-        pins = new ArrayList<Pin>(0);
+        pinsInRange = new HashMap<Integer, Pin>();
+        pinsOutOfRange = new HashMap<Integer, Pin>();
+        users = new HashMap<Integer, User>();
 
+        lastKnownLoc = null;
+        lastQueryLoc = null;
         initLocationServices(this);
         getLocation(this);
-
-        PinRetrieval pinGetter = new PinRetrieval(thisActivity);
-        pinGetter.execute("https://www.abitatech.net:5000/api/pins/");
     }
 
     /**
@@ -166,6 +171,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 if (locationManager != null)  {
                     lastKnownLoc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    if (lastQueryLoc == null) lastQueryLoc = lastKnownLoc;
                     updateCoordinates();
                 }
             }
@@ -178,52 +184,63 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void updateCoordinates() {
         LatLng here = new LatLng(lastKnownLoc.getLatitude(), lastKnownLoc.getLongitude());
 
-        // Todo: change this to be pins in a range
-        //PinRetrieval pinGetter = new PinRetrieval(thisActivity);
-        //pinGetter.execute("https://www.abitatech.net:5000/api/pins/");
+        if (lastKnownLoc.distanceTo(lastQueryLoc) > 100) {
+            PinRetrieval pinGetter = new PinRetrieval(thisActivity);
+            pinGetter.execute("https://www.abitatech.net:5000/api/pins?latitude="
+                    + here.latitude + "&longitude=" + here.longitude + "&radius=1000");
+            lastQueryLoc = lastKnownLoc;
+        }
+
+        updatePinsInRange();
 
         // setMarker(this, here);
 
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(here, 19.0f, 0f, 0f)));
     }
 
-    // Todo: change this to verify that the pin isn't already in the list
-    public void addNewPin(Pin pin) {
-        if (findPinById(pin.getPinId()) != null) return;
-        pins.add(pin);
-        pin.show(mMap);
-    }
-
-    public void addNewUser(User user) {
-        if (findUserById(user.getUserId()) != null) return;
-        users.add(user);
-    }
-
-    // Todo: hopefully won't need this for long
-    public void clearPins() {
-        pins.clear();
+    private void updatePinsInRange() {
+        for (Pin pin : pinsOutOfRange.values()) {
+            pinsInRange.put(pin.getPinId(), pin);
+            pinsOutOfRange.remove(pin.getPinId());
+        }
+        // Pseudo-code:
+        // get all of the pins from pins out of range in ascending order based on distance
+        //      hashmap.values() returns a Collection of values
+        //      then use Collections.sort on them
+        // add those pins to the pins in range
+        // get all of the pins from pins in range in descending order
+        //      do the reverse of the first operation
     }
 
     public Location getMostRecentLocation() {
         return lastKnownLoc;
     }
 
-    /**
-     * Brute force, shouldn't need to be better optimized
-     */
-    public Pin findPinById(int id) {
+    // Accessor and setter methods for Pin and User hashmaps:
+    public void addNewPin(List<Pin> pins) {
         for (Pin pin : pins) {
-            if (pin.getPinId() == id)
-                return pin;
+            if (pinsOutOfRange.containsKey(pin.getPinId())) return; // avoid duplicates
+            if (pinsInRange.containsKey(pin.getPinId())) return; // avoid duplicates
+            pinsOutOfRange.put(pin.getPinId(), pin);
+            pin.show(mMap);
         }
-        return null;
+
+        updatePinsInRange();
     }
 
-    public User findUserById(int id) {
-        for (User user : users) {
-            if (user.getUserId() == id)
-                return user;
-        }
-        return null;
+    public void addNewUser(User user) {
+        if (users.containsKey(user.getUserId())) return; // avoid duplicates
+        users.put(user.getUserId(), user);
+    }
+
+    public Pin findPinById(int pinId) {
+        Pin pin = null;
+        pin = pinsInRange.get(pinId);
+        if (pin != null) return pin;
+        return pinsOutOfRange.get(pinId);
+    }
+
+    public User findUserById(int userId) {
+        return users.get(userId);
     }
 }

@@ -42,7 +42,8 @@ public class Pin {
     final private String pinTitle;
     final private MapsActivity parent;
 
-    // Attributes pulled as needed:
+    // Attributes changed as needed:
+    private boolean inRange;
     private Description[] pinDescriptions;
     private User pinUser;
     private Bitmap thumbnail;
@@ -63,8 +64,13 @@ public class Pin {
         pinTitle = ti;
         parent = p;
 
-        fetchDescriptions();
-        fetchUser();
+        inRange = true;
+
+        pinDescriptions = null;
+        pinUser = null;
+
+        // fetchDescriptions();
+        // fetchUser();
 
         Log.v("Creation", this.toString());
     }
@@ -88,7 +94,14 @@ public class Pin {
                 .icon(BitmapDescriptorFactory.fromBitmap(smallPin)));
     }
 
-    public void fetchDescriptions() {
+    /**
+     * Issues an async_call to get Descriptions for this Pin
+     * @param override if false, won't fetch Descriptions if they have been found already
+     */
+    public void fetchDescriptions(boolean override) {
+        if (!override)
+            if (pinDescriptions != null)
+                return;
         DescriptionRetrieval descGetter = new DescriptionRetrieval((Pin) this);
         descGetter.execute("https://www.abitatech.net:5000/api/pins/" + pinId + "/descriptions");
     }
@@ -101,7 +114,14 @@ public class Pin {
         }
     }
 
-    public void fetchUser() {
+    /**
+     * Issues an async_call to get the User that created this Pin
+     * @param override if false, won't fetch User if they have been found already
+     */
+    public void fetchUser(boolean override) {
+        if (!override)
+            if (pinUser != null)
+                return;
         UserRetrieval userGetter = new UserRetrieval((Pin) this, null);
         userGetter.execute("https://www.abitatech.net:5000/api/users/" + userId);
     }
@@ -143,8 +163,26 @@ public class Pin {
         return pinDescriptions;
     }
 
+    public void setInRange(boolean newVal) {
+        inRange = newVal;
+    }
+
+    public boolean getInRange() {
+        return inRange;
+    }
+
     public String toString() {
-        return "Pin! Title: " + getPinTitle() + " Location: " + getPinLocation();
+        StringBuilder s = new StringBuilder();
+        s.append("Pin!\n");
+        s.append("Id: " + getPinId() + "\n");
+        s.append("Title: " + getPinTitle() + "\n");
+        s.append("Location: " + getPinLocation() + "\n");
+        for (int i = 0; i < pinDescriptions.length; i++) {
+            s.append("Description #" + i + ": ");
+            s.append(pinDescriptions[i].toString() + "\n");
+        }
+
+        return s.toString();
     }
 
     public MapsActivity getParent() {
@@ -196,4 +234,9 @@ public class Pin {
             return true;
         }
     };
+
+    public int distanceTo(LatLng other) {
+        return (int) Math.max(Math.abs(pinLocation.latitude - other.latitude),
+                Math.abs(pinLocation.longitude - other.longitude));
+    }
 }

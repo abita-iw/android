@@ -39,7 +39,7 @@ public class DescriptionRetrieval extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... params) {
-        Log.v("Async_task", "Do in background - Attempting to get data url");
+        Log.v("Async_task", "Do in background - Attempting to get data url " + params[0]);
         try {
             return get(new URL(params[0]));
         } catch (Exception e) {
@@ -66,7 +66,7 @@ public class DescriptionRetrieval extends AsyncTask<String, Void, String> {
         try {
             descriptions = readMessagesArray(reader);
         } catch (Exception e) {
-            Log.v("Async_task", "Read JSON Stream - Failed");
+            Log.v("Async_task", "Description: Read JSON Stream Failed");
         } finally {
             reader.close();
             return descriptions;
