@@ -56,10 +56,8 @@ public class PinRetrieval extends AsyncTask<String, Void, String> {
         try {
             InputStream stream = new ByteArrayInputStream(data.getBytes("UTF-8"));
             ArrayList<Pin> pinsRetrieved = readJsonStream(stream);
-            //mapsActivity.clearPins();
-            for (int i = 0; i < pinsRetrieved.size(); i++) {
-                mapsActivity.addNewPin(pinsRetrieved.get(i));
-            }
+            Log.v("Main", "Adding new pins...");
+            mapsActivity.addNewPins(pinsRetrieved);
         } catch (IOException e) {
             Log.v("Async_task", "On Post Execute - Failed to parse JSON properly");
         }
@@ -137,7 +135,7 @@ public class PinRetrieval extends AsyncTask<String, Void, String> {
         }
         reader.endObject();
 
-        if (mapsActivity.findPinById(pinId) != null)
+        if (mapsActivity.findPinById(pinId) == null)
             return new Pin(pinId, userId, pinType,
                 new LatLng(latitude, longitude), title, mapsActivity);
         else

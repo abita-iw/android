@@ -203,6 +203,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             pinsInRange.put(pin.getPinId(), pin);
             pinsOutOfRange.remove(pin.getPinId());
         }
+
+        for (Pin pin : pinsInRange.values()) {
+            pin.fetchDescriptions(false);
+            pin.fetchUser(false);
+        }
         // Pseudo-code:
         // get all of the pins from pins out of range in ascending order based on distance
         //      hashmap.values() returns a Collection of values
@@ -223,13 +228,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // Accessor and setter methods for Pin and User hashmaps:
     public void addNewPins(List<Pin> pins) {
         for (Pin pin : pins) {
-            if (pinsOutOfRange.containsKey(pin.getPinId())) return; // avoid duplicates
-            if (pinsInRange.containsKey(pin.getPinId())) return; // avoid duplicates
-            pinsOutOfRange.put(pin.getPinId(), pin);
-            pin.show(mMap);
+            if (!pinsOutOfRange.containsKey(pin.getPinId())
+                    && !pinsInRange.containsKey(pin.getPinId())) { // avoid duplicates
+                pinsOutOfRange.put(pin.getPinId(), pin);
+                pin.show(mMap);
+            }
         }
 
         updatePinsInRange();
+
+        Log.v("Main", "Number of pins: " + (pinsInRange.size() + pinsOutOfRange.size()));
     }
 
     public void addNewUser(User user) {
