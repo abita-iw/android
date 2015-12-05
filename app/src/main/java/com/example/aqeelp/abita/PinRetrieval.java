@@ -87,7 +87,6 @@ public class PinRetrieval extends AsyncTask<String, Void, String> {
             if (nextPin != null) // Will be null if the Pin is already found
                 pins.add(nextPin);
         }
-
         reader.endArray();
         return pins;
     }
@@ -101,7 +100,7 @@ public class PinRetrieval extends AsyncTask<String, Void, String> {
         double longitude = 0.0;
         String dateCreated = null;
         String dateModified = null;
-        Description[] descriptions = new Description[0];
+        // Description[] descriptions = new Description[0];
 
         reader.beginObject();
         while (reader.hasNext()) {
@@ -123,7 +122,8 @@ public class PinRetrieval extends AsyncTask<String, Void, String> {
                 dateCreated = reader.nextString();
             } else if (name.equals("dateModified")) {
                 dateModified = reader.nextString();
-            } /*else if (name.equals("descriptions")) {
+            }
+            /*else if (name.equals("descriptions")) {
                 descriptions = readDescriptionArray(reader);
             } else {
                 reader.beginArray();

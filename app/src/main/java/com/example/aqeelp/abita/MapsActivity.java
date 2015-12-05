@@ -15,6 +15,8 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.util.SparseArray;
+import android.util.SparseIntArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -43,9 +45,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private Location lastKnownLoc;
     private Location lastQueryLoc;
-    private HashMap<Integer, Pin> pinsInRange;
-    private HashMap<Integer, Pin> pinsOutOfRange;
-    private HashMap<Integer, User> users;
+    private SparseArray<Pin> pinsInRange;
+    private SparseArray<Pin> pinsOutOfRange;
+    private SparseArray<User> users;
     private MapsActivity thisActivity;
 
     private String PinTypes[] = { "Wildlife", "Foliage", "Scenery", "Landmark" };
@@ -92,9 +94,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID); // Sets to satellite view w/ road names, etc.
         mMap.getUiSettings().setMapToolbarEnabled(false); // Removes default buttons
 
-        pinsInRange = new HashMap<Integer, Pin>();
-        pinsOutOfRange = new HashMap<Integer, Pin>();
-        users = new HashMap<Integer, User>();
+        pinsInRange = new SparseArray<Pin>();
+        pinsOutOfRange = new SparseArray<Pin>();
+        users = new SparseArray<User>();
 
         lastKnownLoc = null;
         lastQueryLoc = null;
@@ -199,12 +201,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void updatePinsInRange() {
-        for (Pin pin : pinsOutOfRange.values()) {
+        for (int i = 0; i < pinsOutOfRange.size(); i++) {
+            Pin pin = pinsOutOfRange.valueAt(i);
             pinsInRange.put(pin.getPinId(), pin);
             pinsOutOfRange.remove(pin.getPinId());
         }
 
-        for (Pin pin : pinsInRange.values()) {
+        for (int i = 0; i < pinsInRange.size(); i++) {
+            Pin pin = pinsInRange.valueAt(i);
             pin.fetchDescriptions(false);
             pin.fetchUser(false);
         }
@@ -225,11 +229,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         pinsInRange.put(pin.getPinId(), pin);
     }
 
-    // Accessor and setter methods for Pin and User hashmaps:
+    // Accessor and setter methods for Pin and User SparseArrays:
     public void addNewPins(List<Pin> pins) {
         for (Pin pin : pins) {
-            if (!pinsOutOfRange.containsKey(pin.getPinId())
-                    && !pinsInRange.containsKey(pin.getPinId())) { // avoid duplicates
+            if (pinsOutOfRange.get(pin.getPinId()) == null
+                    && pinsInRange.get(pin.getPinId()) == null) { // avoid duplicates
                 pinsOutOfRange.put(pin.getPinId(), pin);
                 pin.show(mMap);
             }
@@ -241,7 +245,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void addNewUser(User user) {
-        if (users.containsKey(user.getUserId())) return; // avoid duplicates
+        if (users.get(user.getUserId()) != null) return; // avoid duplicates
         users.put(user.getUserId(), user);
     }
 
