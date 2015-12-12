@@ -51,17 +51,19 @@ public class DescriptionRetrieval extends AsyncTask<String, Void, String> {
     }
 
     protected void onPostExecute(String data) {
-        Log.v("Async_task", "On Post Execute - Attempting to create pins from data");
+        Log.v("Async_task", "On Post Execute - Attempting to create descriptions from data");
         Log.v("Async_task", data);
         try {
             InputStream stream = new ByteArrayInputStream(data.getBytes("UTF-8"));
             ArrayList<Description> descriptionsRetrieved = readJsonStream(stream);
             for (Description description : descriptionsRetrieved) {
                 User user = activity.findUserById(description.getUserId());
-                if (user == null)
-                    description.fetchUser();
-                else
+                if (user != null)
                     description.setPinUser(user);
+                // else
+                    // description.fetchUser();
+
+
             }
             pin.setPinDescriptions((Description[]) descriptionsRetrieved.toArray());
         } catch (IOException e) {
@@ -77,6 +79,7 @@ public class DescriptionRetrieval extends AsyncTask<String, Void, String> {
         } catch (Exception e) {
             Log.v("Async_task", "Description: Read JSON Stream Failed");
         } finally {
+            Log.v("Async_task", descriptions.size() + " descriptions found");
             reader.close();
             return descriptions;
         }

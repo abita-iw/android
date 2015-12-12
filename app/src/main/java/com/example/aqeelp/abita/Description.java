@@ -36,7 +36,7 @@ public class Description {
 
         setDates(dateCreated, dateModified);
 
-        //fetchUser();
+        // fetchUser();
 
         Log.v("Creation", this.toString());
     }

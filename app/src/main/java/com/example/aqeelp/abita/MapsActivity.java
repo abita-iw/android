@@ -89,19 +89,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        // Todo: drop pins (of static content)
+        Log.v("Main", "Map ready, proceeding");
+
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID); // Sets to satellite view w/ road names, etc.
         mMap.getUiSettings().setMapToolbarEnabled(false); // Removes default buttons
+
+        Log.v("Main", "Map initialized");
 
         pinsInRange = new SparseArray<Pin>();
         pinsOutOfRange = new SparseArray<Pin>();
         users = new SparseArray<User>();
 
+        Log.v("Main", "Pin and User caching initialized");
+
         lastKnownLoc = null;
         lastQueryLoc = null;
         initLocationServices(this);
+        Log.v("Main", "Location services initialized");
         getLocation(this);
+        Log.v("Main", "Location listener initialized");
     }
 
     /**
@@ -149,8 +156,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         if ( Build.VERSION.SDK_INT >= 23 &&
-                ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ContextCompat.checkSelfPermission(context,
+                        android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(context,
+                        android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return  ;
         }
 
@@ -210,7 +219,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         for (int i = 0; i < pinsInRange.size(); i++) {
             Pin pin = pinsInRange.valueAt(i);
             pin.fetchDescriptions(false);
-            pin.fetchUser(false);
+            // pin.fetchUser(false);
         }
         // Pseudo-code:
         // get all of the pins from pins out of range in ascending order based on distance

@@ -107,10 +107,12 @@ public class Pin {
     }
 
     public void setPinDescriptions(Description[] descriptions) {
-        pinDescriptions = new Description[descriptions.length];
-        for (int i = 0; i < descriptions.length; i++) {
-            // Make a defensive copy of all descriptions?
-            pinDescriptions[i] = descriptions[i];
+        if (descriptions != null) {
+            pinDescriptions = new Description[descriptions.length];
+            for (int i = 0; i < descriptions.length; i++) {
+                // Make a defensive copy of all descriptions?
+                pinDescriptions[i] = descriptions[i];
+            }
         }
     }
 
@@ -173,13 +175,16 @@ public class Pin {
 
     public String toString() {
         StringBuilder s = new StringBuilder();
-        s.append("Pin!\n");
-        s.append("Id: " + getPinId() + "\n");
-        s.append("Title: " + getPinTitle() + "\n");
-        s.append("Location: " + getPinLocation() + "\n");
-        for (int i = 0; i < pinDescriptions.length; i++) {
-            s.append("Description #" + i + ": ");
-            s.append(pinDescriptions[i].toString() + "\n");
+        s.append("Pin! - ");
+        s.append("Id: " + getPinId() + " - ");
+        s.append("Title: " + getPinTitle() + " - ");
+        s.append("Location: " + getPinLocation());
+        if (pinDescriptions != null) {
+            for (int i = 0; i < pinDescriptions.length; i++) {
+                s.append(" - ");
+                s.append("Description #" + i + ": ");
+                s.append(pinDescriptions[i].toString());
+            }
         }
 
         return s.toString();

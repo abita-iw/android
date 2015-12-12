@@ -105,7 +105,6 @@ public class PinRetrieval extends AsyncTask<String, Void, String> {
         reader.beginObject();
         while (reader.hasNext()) {
             String name = reader.nextName();
-            Log.v("Async_task", name);
             if (name.equals("pinId")) {
                 pinId = reader.nextInt();
             } else if (name.equals("userId")) {
