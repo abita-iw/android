@@ -73,7 +73,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         this.findViewById(R.id.recenter_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getLocation(MapsActivity.this);
+                getLocation();
             }
         });
     }
@@ -105,26 +105,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         lastKnownLoc = null;
         lastQueryLoc = null;
-        initLocationServices(this);
+        initLocationServices();
         Log.v("Main", "Location services initialized");
-        getLocation(this);
+        getLocation();
         Log.v("Main", "Location listener initialized");
     }
 
     /**
      * Sets up location service after permissions is granted
      */
-    private void initLocationServices(Context context) {
-
-
+    private void initLocationServices() {
         if ( Build.VERSION.SDK_INT >= 23 &&
-                ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ContextCompat.checkSelfPermission(thisActivity, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(thisActivity, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
 
-        try   {
-            LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        try {
+            LocationManager locationManager = (LocationManager) thisActivity.getSystemService(Context.LOCATION_SERVICE);
 
             // Define a listener that responds to location updates
             LocationListener locationListener = new LocationListener() {
@@ -152,21 +150,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     /**
      * Sets up location service after permissions is granted
      */
-    private void getLocation(Context context) {
-
-
+    private void getLocation() {
         if ( Build.VERSION.SDK_INT >= 23 &&
-                ContextCompat.checkSelfPermission(context,
+                ContextCompat.checkSelfPermission(thisActivity,
                         android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission(context,
+                && ContextCompat.checkSelfPermission(thisActivity,
                         android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return  ;
+            return;
         }
 
-        try   {
+        try {
             double longitude = 0.0;
             double latitude = 0.0;
-            LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+            LocationManager locationManager = (LocationManager) thisActivity.getSystemService(Context.LOCATION_SERVICE);
 
             // Get GPS and network status
             boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -176,10 +172,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (!isGPSEnabled)    {
                 // cannot get location
                 Toast.makeText(this, "Please enable GPS and restart app!", Toast.LENGTH_LONG);
-            }
-            else
-            {
-
+            } else {
                 if (locationManager != null)  {
                     lastKnownLoc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                     if (lastQueryLoc == null) lastQueryLoc = lastKnownLoc;
@@ -193,9 +186,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // Todo: paint a little icon on the current location
     private void updateCoordinates() {
+        Log.v("UpdateCoordinates", "Updating coordinates...");
         LatLng here = new LatLng(lastKnownLoc.getLatitude(), lastKnownLoc.getLongitude());
 
-        if (lastKnownLoc.distanceTo(lastQueryLoc) > 100) {
+        if (lastQueryLoc != null) {
+            Log.v("UpdateCoordinates", "LastQueryLocation init");
+            if (lastKnownLoc.distanceTo(lastQueryLoc) > 100) {
+                PinRetrieval pinGetter = new PinRetrieval(thisActivity);
+                pinGetter.execute("https://www.abitatech.net:5000/api/pins?latitude="
+                        + here.latitude + "&longitude=" + here.longitude + "&radius=1000");
+                lastQueryLoc = lastKnownLoc;
+            }
+        } else {
+            Log.v("UpdateCoordinates", "LastQueryLocation not yet init");
             PinRetrieval pinGetter = new PinRetrieval(thisActivity);
             pinGetter.execute("https://www.abitatech.net:5000/api/pins?latitude="
                     + here.latitude + "&longitude=" + here.longitude + "&radius=1000");
