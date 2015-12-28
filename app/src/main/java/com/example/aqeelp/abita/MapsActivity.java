@@ -265,7 +265,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         for (int i = 0; i < pinsInRange.size(); i++) {
             Pin pin = pinsInRange.valueAt(i);
             pin.fetchDescriptions(false);
-            // pin.fetchUser(false);
+            pin.fetchUser(false);
         }
         // Pseudo-code:
         // get all of the pins from pins out of range in ascending order based on distance

@@ -92,6 +92,7 @@ public class UserRetrieval extends AsyncTask<String, Void, String> {
     public User readMessage(JsonReader reader) throws IOException {
         int userId = -1;
         String email = null;
+        String disp_name = null;
 
         reader.beginObject();
         while (reader.hasNext()) {
@@ -100,11 +101,15 @@ public class UserRetrieval extends AsyncTask<String, Void, String> {
                 userId = reader.nextInt();
             } else if (name.equals("email")) {
                 email = reader.nextString();
+            } else if (name.equals("displayName")) {
+                disp_name = reader.nextString();
+            } else {
+                reader.nextString();
             }
         }
         reader.endObject();
 
-        return new User(userId, email, email);
+        return new User(userId, email, disp_name);
     }
 
     private String get(URL url) throws IOException {

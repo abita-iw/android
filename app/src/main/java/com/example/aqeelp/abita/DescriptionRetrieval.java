@@ -63,9 +63,9 @@ public class DescriptionRetrieval extends AsyncTask<String, Void, String> {
                 if (user != null) {
                     description.setPinUser(user);
                     Log.v("Async_task", "User was found.. " + user.getUserId());
+                } else {
+                    description.fetchUser();
                 }
-                // else
-                    // description.fetchUser();
 
                 pinDescriptions[i] = description;
             }
