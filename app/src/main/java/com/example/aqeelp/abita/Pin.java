@@ -107,6 +107,7 @@ public class Pin {
     }
 
     public void setPinDescriptions(Description[] descriptions) {
+        Log.v("Pin", "Descriptions received, adding to pin");
         if (descriptions != null) {
             pinDescriptions = new Description[descriptions.length];
             for (int i = 0; i < descriptions.length; i++) {

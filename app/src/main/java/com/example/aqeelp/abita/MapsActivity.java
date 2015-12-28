@@ -94,7 +94,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         Log.v("Main", "Map ready, proceeding");
 
-        ActivityCompat.requestPermissions(thisActivity,
+        if (Build.VERSION.SDK_INT >= 23)
+            ActivityCompat.requestPermissions(thisActivity,
                 new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,
                         android.Manifest.permission.ACCESS_COARSE_LOCATION},
                 LOCATION_PERMISSIONS_CALLBACK);
@@ -108,6 +109,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         pinsInRange = new SparseArray<Pin>();
         pinsOutOfRange = new SparseArray<Pin>();
         users = new SparseArray<User>();
+
+        lastKnownLoc = null;
+        lastQueryLoc = null;
 
         Log.v("Main", "Pin and User caching initialized");
     }
@@ -215,7 +219,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             } else {
                 if (locationManager != null) {
                     lastKnownLoc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                    if (lastQueryLoc == null) lastQueryLoc = lastKnownLoc;
                     updateCoordinates();
                 }
             }
@@ -224,7 +227,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    // Todo: paint a little icon on the current location
     private void updateCoordinates() {
         Log.v("UpdateCoordinates", "Updating coordinates...");
         LatLng here = new LatLng(lastKnownLoc.getLatitude(), lastKnownLoc.getLongitude());
@@ -234,24 +236,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (lastKnownLoc.distanceTo(lastQueryLoc) > 100) {
                 PinRetrieval pinGetter = new PinRetrieval(thisActivity);
                 pinGetter.execute("https://www.abitatech.net:5000/api/pins?latitude="
-                        + here.latitude + "&longitude=" + here.longitude + "&radius=1000");
+                        + here.latitude + "&longitude=" + here.longitude + "&radius=100000");
                 lastQueryLoc = lastKnownLoc;
             }
         } else {
             Log.v("UpdateCoordinates", "LastQueryLocation not yet init");
             PinRetrieval pinGetter = new PinRetrieval(thisActivity);
             pinGetter.execute("https://www.abitatech.net:5000/api/pins?latitude="
-                    + here.latitude + "&longitude=" + here.longitude + "&radius=1000");
+                    + here.latitude + "&longitude=" + here.longitude + "&radius=100000");
             lastQueryLoc = lastKnownLoc;
         }
 
         updatePinsInRange();
 
-        // setMarker(this, here);
+        // TODO: setMarker(this, here);
 
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(here, 19.0f, 0f, 0f)));
     }
 
+    // TODO: Currently making all pins 'in range'
     private void updatePinsInRange() {
         for (int i = 0; i < pinsOutOfRange.size(); i++) {
             Pin pin = pinsOutOfRange.valueAt(i);

@@ -73,7 +73,7 @@ public class PinRetrieval extends AsyncTask<String, Void, String> {
             Log.v("Async_task", "Pin: 75 " + e.toString());
         } finally {
             reader.close();
-            Log.v("Async_task", "reader close");
+            Log.v("Async_task", "pin reader close");
             return pins;
         }
     }

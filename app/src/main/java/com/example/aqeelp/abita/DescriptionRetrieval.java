@@ -56,16 +56,21 @@ public class DescriptionRetrieval extends AsyncTask<String, Void, String> {
         try {
             InputStream stream = new ByteArrayInputStream(data.getBytes("UTF-8"));
             ArrayList<Description> descriptionsRetrieved = readJsonStream(stream);
-            for (Description description : descriptionsRetrieved) {
+            Description[] pinDescriptions = new Description[descriptionsRetrieved.size()];
+            for (int i = 0; i < descriptionsRetrieved.size(); i++) {
+                Description description = descriptionsRetrieved.get(i);
                 User user = activity.findUserById(description.getUserId());
-                if (user != null)
+                if (user != null) {
                     description.setPinUser(user);
+                    Log.v("Async_task", "User was found.. " + user.getUserId());
+                }
                 // else
                     // description.fetchUser();
 
-
+                pinDescriptions[i] = description;
             }
-            pin.setPinDescriptions((Description[]) descriptionsRetrieved.toArray());
+            Log.v("Async_task", "Array made from descriptions");
+            pin.setPinDescriptions(pinDescriptions);
         } catch (IOException e) {
             Log.v("Async_task", "On Post Execute - Failed to parse JSON properly");
         }
@@ -81,6 +86,7 @@ public class DescriptionRetrieval extends AsyncTask<String, Void, String> {
         } finally {
             Log.v("Async_task", descriptions.size() + " descriptions found");
             reader.close();
+            Log.v("Async_task", "description reader close");
             return descriptions;
         }
     }
