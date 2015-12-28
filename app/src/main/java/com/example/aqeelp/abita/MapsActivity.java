@@ -1,5 +1,6 @@
 package com.example.aqeelp.abita;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -11,6 +12,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -49,6 +51,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private SparseArray<Pin> pinsOutOfRange;
     private SparseArray<User> users;
     private MapsActivity thisActivity;
+    private final int LOCATION_PERMISSIONS_CALLBACK = 0;
 
     private String PinTypes[] = { "Wildlife", "Foliage", "Scenery", "Landmark" };
 
@@ -91,6 +94,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         Log.v("Main", "Map ready, proceeding");
 
+        ActivityCompat.requestPermissions(thisActivity,
+                new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,
+                        android.Manifest.permission.ACCESS_COARSE_LOCATION},
+                LOCATION_PERMISSIONS_CALLBACK);
+
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID); // Sets to satellite view w/ road names, etc.
         mMap.getUiSettings().setMapToolbarEnabled(false); // Removes default buttons
@@ -102,13 +110,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         users = new SparseArray<User>();
 
         Log.v("Main", "Pin and User caching initialized");
+    }
 
-        lastKnownLoc = null;
-        lastQueryLoc = null;
-        initLocationServices();
-        Log.v("Main", "Location services initialized");
-        getLocation();
-        Log.v("Main", "Location listener initialized");
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        Log.v("Main", "Permissions request result received");
+        switch (requestCode) {
+            case LOCATION_PERMISSIONS_CALLBACK: {
+                Log.v("Main", "Location request received");
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    initLocationServices();
+                    getLocation();
+                    Log.v("Main", "Location listener initialized");
+                } else {
+                    exit();
+                }
+                return;
+            }
+        }
+    }
+
+    public void exit() {
+        thisActivity.finish();
+        System.exit(0);
     }
 
     /**
@@ -118,6 +145,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if ( Build.VERSION.SDK_INT >= 23 &&
                 ContextCompat.checkSelfPermission(thisActivity, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(thisActivity, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.v("Main", "InitLocationServices(): Permissions not currently granted");
+            ActivityCompat.requestPermissions(thisActivity,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,
+                            android.Manifest.permission.ACCESS_COARSE_LOCATION},
+                    LOCATION_PERMISSIONS_CALLBACK);
             return;
         }
 
@@ -133,17 +165,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     PinManager.getSurroundingPins(location);
                 }
 
-                public void onStatusChanged(String provider, int status, Bundle extras) {}
+                public void onStatusChanged(String provider, int status, Bundle extras) {
+                }
 
-                public void onProviderEnabled(String provider) {}
+                public void onProviderEnabled(String provider) {
+                }
 
-                public void onProviderDisabled(String provider) {}
+                public void onProviderDisabled(String provider) {
+                }
             };
 
             // Register the listener with the Location Manager to receive location updates
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-        } catch (Exception ex)  {
-            Log.v("Location", "Error creating location service: " + ex.getMessage());
+        } catch (Exception ex) {
+            Log.v("Main", "InitLocationServices(): Error creating location service: " + ex.getMessage());
         }
     }
 
@@ -156,6 +191,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ContextCompat.checkSelfPermission(thisActivity,
                         android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.v("Main", "GetLocation(): Permissions not granted");
+            ActivityCompat.requestPermissions(thisActivity,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,
+                            android.Manifest.permission.ACCESS_COARSE_LOCATION},
+                    LOCATION_PERMISSIONS_CALLBACK);
             return;
         }
 
@@ -169,18 +209,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             boolean locationServiceAvailable;
 
-            if (!isGPSEnabled)    {
+            if (!isGPSEnabled) {
                 // cannot get location
                 Toast.makeText(this, "Please enable GPS and restart app!", Toast.LENGTH_LONG);
             } else {
-                if (locationManager != null)  {
+                if (locationManager != null) {
                     lastKnownLoc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                     if (lastQueryLoc == null) lastQueryLoc = lastKnownLoc;
                     updateCoordinates();
                 }
             }
-        } catch (Exception ex)  {
-            Log.v("Location", "Error creating location service: " + ex.getMessage());
+        } catch (Exception ex) {
+            Log.v("Main", "GetLocation(): Error creating location service: " + ex.getMessage());
         }
     }
 
