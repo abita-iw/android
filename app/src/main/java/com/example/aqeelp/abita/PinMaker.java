@@ -35,7 +35,8 @@ public class PinMaker {
             Pin pin = new Pin(-1, 26, newPinType, location,
                     newPinTitle, parent);
             Log.v("PinPost", "Starting pin post");
-            new PinPost(pin);
+            PinPost poster = new PinPost(pin);
+            poster.execute("https://api.abitatech.net:5000/api/pins");
             Log.v("PinPost", "Pin posted, added to parent");
             parent.addNewPin(pin);
         }
