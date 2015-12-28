@@ -50,7 +50,6 @@ public class UserRetrieval extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... params) {
-        // TODO: don't add User if already found
         Log.v("Async_task", "Do in background - Attempting to get data url " + params[0]);
         try {
             return get(new URL(params[0]));

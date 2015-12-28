@@ -32,8 +32,11 @@ public class PinMaker {
 
     private static void generatePin() {
         if (newPinType != null && newPinTitle != null && newPinCaption != null) {
-            Pin pin = new Pin((int) (100000 * Math.random()), 26, newPinType, location,
+            Pin pin = new Pin(-1, 26, newPinType, location,
                     newPinTitle, parent);
+            Log.v("PinPost", "Starting pin post");
+            new PinPost(pin);
+            Log.v("PinPost", "Pin posted, added to parent");
             parent.addNewPin(pin);
         }
     }
