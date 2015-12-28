@@ -16,9 +16,22 @@
             android:id="@+id/PinInfoTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp"
+            android:paddingTop="10dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
             android:text="Title"
             android:textSize="30dp"
+            android:textColor="#ffffffff"/>
+
+        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/PinInfoUser"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="Title"
+            android:textSize="15dp"
             android:textColor="#ffffffff"/>
 
         <LinearLayout
@@ -78,7 +91,7 @@
         android:id="@+id/pin_description_section">
     </LinearLayout>
 
-    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    <!-- <TextView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/PinInfoReadMore"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -87,7 +100,17 @@
         android:padding="15dp"
         android:gravity="center"
         android:background="#Fffbbc05"
-        android:textColor="#ffffffff"/>
+        android:textColor="#ffffffff"/> -->
+
+    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/PinInfoReadMore"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:padding="15dp"
+        android:gravity="center"
+        android:background="#Fffbbc05"
+        android:textColor="#ffffffff"/> -->
+
 
 
 </LinearLayout>

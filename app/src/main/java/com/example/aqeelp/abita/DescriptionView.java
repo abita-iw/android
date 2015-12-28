@@ -2,6 +2,7 @@ package com.example.aqeelp.abita;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -11,26 +12,31 @@ import android.widget.TextView;
  */
 public class DescriptionView extends FrameLayout {
     Description description;
+    Context context;
 
-    public DescriptionView(Context context, AttributeSet attrs, int defStyle, Description d) {
-        super(context, attrs, defStyle);
+    public DescriptionView(Context c, AttributeSet attrs, int defStyle, Description d) {
+        super(c, attrs, defStyle);
+        context = c;
         description = d;
     }
 
-    public DescriptionView(Context context, AttributeSet attrs, Description d) {
-        super(context, attrs);
+    public DescriptionView(Context c, AttributeSet attrs, Description d) {
+        super(c, attrs);
+        context = c;
         description = d;
     }
 
-    public DescriptionView(Context context, Description d) {
-        super(context);
+    public DescriptionView(Context c, Description d) {
+        super(c);
+        context = c;
         description = d;
     }
 
     public View getView() {
-        View view = inflate(getContext(), R.layout.description_layout, null);
-        ((TextView) view.findViewById(R.id.description_name)).setText(description.getUserId());
-        ((TextView) view.findViewById(R.id.description_date)).setText(description.getCreatedAt().toString());
+        View view = inflate(this.context, R.layout.description_layout, null);
+        ((TextView) view.findViewById(R.id.description_name)).setText(description.getUser().getDisplayName() + " says...");
+        // TODO ((TextView) view.findViewById(R.id.description_date)).setText(description.getCreatedAt().toString());
+        ((TextView) view.findViewById(R.id.description_date)).setText("Date created");
         ((TextView) view.findViewById(R.id.description_content)).setText(description.getText());
         return view;
     }

@@ -19,6 +19,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -174,6 +176,18 @@ public class Pin {
         return inRange;
     }
 
+    public User getPinUser() {
+        return pinUser;
+    }
+
+    public boolean hasDescriptions() {
+        return (pinDescriptions != null);
+    }
+
+    public boolean hasUser() {
+        return (pinUser != null);
+    }
+
     public String toString() {
         StringBuilder s = new StringBuilder();
         s.append("Pin! - ");
@@ -217,6 +231,10 @@ public class Pin {
                 String title = pin.getPinTitle() + " - " + PINTYPES.get(pin.getPinTypeIndex());
                 titleView.setText(title);
 
+                // Set user (default previous disabled)
+                TextView userView = (TextView) dialog.findViewById(R.id.PinInfoUser);
+                userView.setText("Spotted by " + pin.getPinUser().getDisplayName());
+
                 View header = dialog.findViewById(R.id.PinInfoHeader);
                 View readMore = dialog.findViewById(R.id.PinInfoReadMore);
                 header.setBackgroundColor(PINCOLORS[pin.getPinTypeIndex()]);
@@ -225,10 +243,31 @@ public class Pin {
                 //TODO: fill section with descriptions
                 LinearLayout descriptionSection = (LinearLayout)
                         dialog.findViewById(R.id.pin_description_section);
-                Description[] descs = pin.getPinDescriptions();
-                for (int i = 0; i < descs.length; i++) {
-                    Context context = pin.getParent().getApplicationContext();
-                    DescriptionView descriptionView = new DescriptionView(context, descs[i]);
+                Description[] descriptions = pin.getPinDescriptions();
+                for (int i = 0; i < descriptions.length; i++) {
+                    /* View horizontalLine = new View(pin.getParent());
+                    horizontalLine.setBackgroundColor(0xFF999999);
+                    horizontalLine.setPadding(10, 10, 10, 10);
+                    descriptionSection.addView(horizontalLine,
+                            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 3));
+
+                    TextView username = new TextView(pin.getParent());
+                    username.setText(descriptions[i].getUser().getDisplayName() + " says...");
+                    // username.setTextSize(15.0f);
+                    descriptionSection.addView(username,
+                            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT));
+
+                    TextView content = new TextView(pin.getParent());
+                    Log.v("Pin", descriptions[i].getDescriptionId() + " " + descriptions[i].getText());
+                    content.setText(descriptions[i].getText());
+                    // content.setTextSize(20.0f);
+                    descriptionSection.addView(content,
+                            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT)); */
+
+                    Context context = pin.getParent();
+                    DescriptionView descriptionView = new DescriptionView(context, descriptions[i]);
                     descriptionSection.addView(descriptionView.getView());
                 }
 
