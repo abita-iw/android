@@ -45,6 +45,7 @@ import java.util.Map;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
     static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int READ_WRITE_PERMISSIONS_CALLBACK = 2;
 
     private GoogleMap mMap;
     private Location lastKnownLoc;
@@ -68,6 +69,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         thisActivity = this;
+    }
+
+    /**
+     * Manipulates the map once available.
+     * This callback is triggered when the map is ready to be used.
+     * This is where we can add markers or lines, add listeners or move the camera. In this case,
+     * we just add a marker near Sydney, Australia.
+     * If Google Play services is not installed on the device, the user will be prompted to install
+     * it inside the SupportMapFragment. This method will only be triggered once the user has
+     * installed Google Play services and returned to the app.
+     */
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        Log.v("Main", "Map ready, proceeding");
+
+        if (Build.VERSION.SDK_INT >= 23)
+            ActivityCompat.requestPermissions(thisActivity,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION},
+                LOCATION_PERMISSIONS_CALLBACK);
 
         this.findViewById(R.id.image_button).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,26 +110,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 getLocation();
             }
         });
-    }
-
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        Log.v("Main", "Map ready, proceeding");
-
-        if (Build.VERSION.SDK_INT >= 23)
-            ActivityCompat.requestPermissions(thisActivity,
-                new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,
-                        android.Manifest.permission.ACCESS_COARSE_LOCATION},
-                LOCATION_PERMISSIONS_CALLBACK);
 
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID); // Sets to satellite view w/ road names, etc.
@@ -141,6 +142,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Log.v("Main", "Location listener initialized");
                 } else {
                     exit();
+                }
+                return;
+            }
+            case READ_WRITE_PERMISSIONS_CALLBACK: {
+                Log.v("Main", "Read write request received");
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    if (camera != null)
+                        camera.dispatchTakePictureIntent();
+                    Log.v("Main", "Camera dispatched");
                 }
                 return;
             }
