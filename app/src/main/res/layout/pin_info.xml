@@ -78,10 +78,11 @@
     <ImageView
         android:id="@+id/PinInfoImage"
         android:layout_width="wrap_content"
-        android:layout_height="150dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:maxHeight="400dp"
         android:padding="15dp"
-        android:cropToPadding="true"
-        android:src="@drawable/goose_example"/>
+        android:cropToPadding="true" />
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"

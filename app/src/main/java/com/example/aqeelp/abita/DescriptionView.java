@@ -34,7 +34,10 @@ public class DescriptionView extends FrameLayout {
 
     public View getView() {
         View view = inflate(this.context, R.layout.description_layout, null);
-        ((TextView) view.findViewById(R.id.description_name)).setText(description.getUser().getDisplayName() + " says...");
+        if (description.getUser() != null)
+            ((TextView) view.findViewById(R.id.description_name)).setText(description.getUser().getDisplayName() + " says...");
+        else
+            ((TextView) view.findViewById(R.id.description_name)).setText("An anonymous user says...");
         // TODO ((TextView) view.findViewById(R.id.description_date)).setText(description.getCreatedAt().toString());
         ((TextView) view.findViewById(R.id.description_date)).setText("Date created");
         ((TextView) view.findViewById(R.id.description_content)).setText(description.getText());

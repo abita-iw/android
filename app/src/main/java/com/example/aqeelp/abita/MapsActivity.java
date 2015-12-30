@@ -3,6 +3,7 @@ package com.example.aqeelp.abita;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -43,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+    static final int REQUEST_IMAGE_CAPTURE = 1;
 
     private GoogleMap mMap;
     private Location lastKnownLoc;
@@ -52,6 +54,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private SparseArray<User> users;
     private MapsActivity thisActivity;
     private final int LOCATION_PERMISSIONS_CALLBACK = 0;
+    private Camera camera;
 
     private String PinTypes[] = { "Wildlife", "Foliage", "Scenery", "Landmark" };
 
@@ -65,6 +68,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         thisActivity = this;
+
+        this.findViewById(R.id.image_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                camera = new Camera(getThisActivity());
+            }
+        });
 
         this.findViewById(R.id.pin_button).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -282,8 +292,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return lastKnownLoc;
     }
 
+    public MapsActivity getThisActivity() {
+        return thisActivity;
+    }
+
     public void addNewPin(Pin pin) {
         pinsInRange.put(pin.getPinId(), pin);
+        pin.show(mMap);
     }
 
     // Accessor and setter methods for Pin and User SparseArrays:
@@ -315,5 +330,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public User findUserById(int userId) {
         return users.get(userId);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            if (camera != null) camera.activityResult(data);
+        }
     }
 }

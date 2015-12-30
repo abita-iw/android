@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -70,6 +71,8 @@ public class Pin {
 
         pinDescriptions = null;
         pinUser = null;
+
+        thumbnail = null;
 
         // fetchDescriptions();
         // fetchUser();
@@ -135,6 +138,14 @@ public class Pin {
         // Defensive copy? probably not
         this.pinUser = user;
         parent.addNewUser(user);
+    }
+
+    public void setThumbnail(Bitmap bitmap) {
+        thumbnail = bitmap;
+    }
+
+    public Bitmap getThumbnail() {
+        return thumbnail;
     }
 
     /**
@@ -225,32 +236,43 @@ public class Pin {
 
                 // Set the layout view of the dialog
                 dialog.setContentView(R.layout.pin_info);
+                Log.v("PinDisplay", "inflated");
 
                 // Set title (default previous disabled)
                 TextView titleView = (TextView) dialog.findViewById(R.id.PinInfoTitle);
                 String title = pin.getPinTitle() + " - " + PINTYPES.get(pin.getPinTypeIndex());
                 titleView.setText(title);
+                Log.v("PinDisplay", "title set");
 
                 // Set user (default previous disabled)
                 TextView userView = (TextView) dialog.findViewById(R.id.PinInfoUser);
-                userView.setText("Spotted by " + pin.getPinUser().getDisplayName());
+                if (pin.getPinUser() != null)
+                    userView.setText("Spotted by " + pin.getPinUser().getDisplayName());
+                else
+                    userView.setText("Spotted by an anonymous user");
+                Log.v("PinDisplay", "user set");
+
+                // Set image (if possible)
+                Bitmap thumbnail = pin.getThumbnail();
+                if (thumbnail != null) {
+                    ImageView thumbnailView = (ImageView) dialog.findViewById(R.id.PinInfoImage);
+                    thumbnailView.setImageBitmap(thumbnail);
+                    Log.v("PinDisplay", "image set");
+                }
 
                 View header = dialog.findViewById(R.id.PinInfoHeader);
                 View readMore = dialog.findViewById(R.id.PinInfoReadMore);
                 header.setBackgroundColor(PINCOLORS[pin.getPinTypeIndex()]);
                 readMore.setBackgroundColor(PINCOLORS[pin.getPinTypeIndex()]);
+                Log.v("PinDisplay", "colors set");
 
                 //TODO: fill section with descriptions
                 LinearLayout descriptionSection = (LinearLayout)
                         dialog.findViewById(R.id.pin_description_section);
                 Description[] descriptions = pin.getPinDescriptions();
+                Log.v("PinDisplay", "descriptions being set...");
                 for (int i = 0; i < descriptions.length; i++) {
-                    /* View horizontalLine = new View(pin.getParent());
-                    horizontalLine.setBackgroundColor(0xFF999999);
-                    horizontalLine.setPadding(10, 10, 10, 10);
-                    descriptionSection.addView(horizontalLine,
-                            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 3));
-
+                    /*
                     TextView username = new TextView(pin.getParent());
                     username.setText(descriptions[i].getUser().getDisplayName() + " says...");
                     // username.setTextSize(15.0f);
@@ -269,7 +291,17 @@ public class Pin {
                     Context context = pin.getParent();
                     DescriptionView descriptionView = new DescriptionView(context, descriptions[i]);
                     descriptionSection.addView(descriptionView.getView());
+
+                    if (descriptions.length - i > 1) {
+                        View horizontalLine = new View(pin.getParent());
+                        horizontalLine.setBackgroundColor(0xFF999999);
+                        horizontalLine.setPadding(10, 10, 10, 10);
+                        descriptionSection.addView(horizontalLine,
+                                new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 3));
+                    }
                 }
+
+                Log.v("PinDisplay", "descriptions set");
 
                 // Force size
                 dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
