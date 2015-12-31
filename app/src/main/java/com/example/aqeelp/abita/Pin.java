@@ -29,12 +29,12 @@ import java.util.Arrays;
  * Created by aqeelp on 10/24/15.
  */
 public class Pin {
-    final private String[] PINTYPESTRINGS = { "Wildlife", "Foliage", "Landscape", "Architecture" };
+    final private String[] PINTYPESTRINGS = { "Wildlife", "Foliage", "Architecture", "Landscape" };
     final private ArrayList<String> PINTYPES =
             new ArrayList<String>(Arrays.asList(PINTYPESTRINGS));
     final private int[] PINCOLORS = { Color.parseColor("#fffbbc05"),
-            Color.parseColor("#ff34a853"), Color.parseColor("#ff2c59a3"),
-            Color.parseColor("#ffea4335") };
+            Color.parseColor("#ff34a853"), Color.parseColor("#ffea4335"),
+            Color.parseColor("#ff2c59a3") };
 
     // Static attributes, received on creation:
     final private int pinId;
@@ -77,9 +77,7 @@ public class Pin {
         pinUser = null;
 
         thumbnail = null;
-
-        // fetchDescriptions();
-        // fetchUser();
+        fullSize = null;
 
         Log.v("Creation", this.toString());
     }
@@ -90,8 +88,8 @@ public class Pin {
         Bitmap[] pinIcons = {
                 BitmapFactory.decodeResource(parent.getResources(), R.drawable.wildlife_pin),
                 BitmapFactory.decodeResource(parent.getResources(), R.drawable.foliage_pin),
-                BitmapFactory.decodeResource(parent.getResources(), R.drawable.landscape_pin),
-                BitmapFactory.decodeResource(parent.getResources(), R.drawable.landmark_pin)
+                BitmapFactory.decodeResource(parent.getResources(), R.drawable.landmark_pin),
+                BitmapFactory.decodeResource(parent.getResources(), R.drawable.landscape_pin)
         };
 
         Bitmap fullSizePin = pinIcons[pinTypeIndex];

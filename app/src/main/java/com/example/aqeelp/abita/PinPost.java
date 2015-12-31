@@ -27,7 +27,7 @@ import javax.net.ssl.X509TrustManager;
  * Created by aqeelp on 12/28/15.
  */
 public class PinPost extends AsyncTask<String, Void, String> {
-    final private String[] PINTYPESTRINGS = { "Wildlife", "Foliage", "Landscape", "Architecture" };
+    final private String[] PINTYPESTRINGS = { "Wildlife", "Foliage", "Architecture", "Landscape" };
     final private ArrayList<String> PINTYPES =
             new ArrayList<String>(Arrays.asList(PINTYPESTRINGS));
     JSONObject json;
