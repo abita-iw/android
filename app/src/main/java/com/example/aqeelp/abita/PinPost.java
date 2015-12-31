@@ -96,8 +96,8 @@ public class PinPost extends AsyncTask<String, Void, String> {
             if (picture != null) {
                 // TODO: upload image
                 pin.setThumbnail(picture);
-                PicturePost uploadPicture = new PicturePost(pin, picture);
-                uploadPicture.execute("https://www.abitatech.net:5000/api/pictures");
+                // TODO PicturePost uploadPicture = new PicturePost(pin, picture);
+                // TODO uploadPicture.execute("https://www.abitatech.net:5000/api/pictures");
             }
 
             Log.v("PinPost", "Found a thumbnail and set it");
@@ -124,7 +124,7 @@ public class PinPost extends AsyncTask<String, Void, String> {
         JSONObject pinJSON = new JSONObject();
 
         try {
-            pinJSON.put("userId", 18); // TODO: global user
+            pinJSON.put("userId", CONTEXT.getCurrentUser().getUserId()); // TODO: global user
             pinJSON.put("typeId", newPinTypeIndex + 1);
             pinJSON.put("latitude", location.latitude);
             pinJSON.put("longitude", location.longitude);

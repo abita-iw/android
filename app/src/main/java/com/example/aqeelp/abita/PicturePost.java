@@ -1,5 +1,6 @@
 package com.example.aqeelp.abita;
 
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -7,6 +8,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -20,20 +24,20 @@ import javax.net.ssl.X509TrustManager;
 /**
  * Created by aqeelp on 12/28/15.
  */
-public class DescriptionPost extends AsyncTask<String, Void, String> {
+public class PicturePost extends AsyncTask<String, Void, String> {
     JSONObject json;
     Pin pin;
-    String text;
+    Bitmap image;
 
-    public DescriptionPost(Pin p, String t) {
+    public PicturePost(Pin p, Bitmap i) {
         pin = p;
-        text = t;
+        image = i;
 
         trustEveryone();
 
         // Create the JSON object for this pin
-        json = makeDescriptionJSON();
-        Log.v("DescriptionPost", "Description JSON constructed");
+        json = makePictureJSON();
+        Log.v("PicturePost", "Description JSON constructed");
         if (json == null) return;
     }
 
@@ -41,58 +45,55 @@ public class DescriptionPost extends AsyncTask<String, Void, String> {
         // Issue post request
         try {
 
-            Log.v("DescriptionPost", "Issuing description post request...");
+            Log.v("PicturePost", "Issuing description post request...");
+
+            //create a file to write bitmap data
+            File pictureFile = new File(pin.getParent().getCacheDir(), "tmpfile.png");
+            pictureFile.createNewFile();
+
+            //Convert bitmap to byte array
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            image.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
+            byte[] bitmapdata = bos.toByteArray();
+
+            //write the bytes in file
+            FileOutputStream fos = new FileOutputStream(pictureFile);
+            fos.write(bitmapdata);
+            fos.flush();
+            fos.close();
 
             ByteArrayOutputStream result = new ByteArrayOutputStream();
-            HttpRequest.post(params[0])
-                    .contentType(HttpRequest.CONTENT_TYPE_JSON)
-                    .send(json.toString())
+            HttpRequest.post(params[0] + "?userId=" + pin.getUserId() + "&pinId=" + pin.getPinId())
+                    .send(pictureFile)
                     .receive(result);
 
-            Log.v("DescriptionPost", "Completed.");
+            pictureFile.delete();
+
+            Log.v("PicturePost", "Completed.");
             return result.toString();
 
         } catch (HttpRequest.HttpRequestException e) {
-            Log.v("DescriptionPost", "Exception: " + e.toString());
+            Log.v("PicturePost", "Exception: " + e.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return null;
     }
 
     protected void onPostExecute(String response) {
-        Log.v("DescriptionPost", "Response received: " + response);
-
-        try {
-            JSONObject receivedJSON = new JSONObject(response);
-
-            Description description = new Description(receivedJSON.getInt("descriptionId"),
-                    receivedJSON.getInt("userId"),
-                    receivedJSON.getInt("pinId"),
-                    receivedJSON.getString("text"),
-                    receivedJSON.getString("dateCreated"),
-                    receivedJSON.getString("dateModified"),
-                    pin.getParent());
-
-            Description[] descriptions = new Description[1];
-            descriptions[0] = description;
-            pin.setPinDescriptions(descriptions);
-
-            Log.v("DescriptionPost", "Made description and added it");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        Log.v("PicturePost", "Response received: " + response);
     }
 
-    private JSONObject makeDescriptionJSON() {
+    private JSONObject makePictureJSON() {
         JSONObject pinJSON = new JSONObject();
 
         try {
             pinJSON.put("userId", pin.getParent().getCurrentUser().getUserId()); // TODO: global user
             pinJSON.put("pinId", pin.getPinId());
-            pinJSON.put("text", text);
 
             return pinJSON;
         } catch (JSONException e) {
-            Log.v("DescriptionPost", "JSON Exception");
+            Log.v("PicturePost", "JSON Exception");
         }
 
         return null;

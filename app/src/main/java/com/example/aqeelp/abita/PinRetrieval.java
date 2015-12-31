@@ -2,7 +2,6 @@ package com.example.aqeelp.abita;
 
 import android.os.AsyncTask;
 import android.util.JsonReader;
-import android.util.JsonToken;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -15,7 +14,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -122,15 +120,6 @@ public class PinRetrieval extends AsyncTask<String, Void, String> {
             } else if (name.equals("dateModified")) {
                 dateModified = reader.nextString();
             }
-            /*else if (name.equals("descriptions")) {
-                descriptions = readDescriptionArray(reader);
-            } else {
-                reader.beginArray();
-                while (reader.hasNext()) {
-                    Log.v("Async_task", "Actually we're caught in a loop");
-                }
-                reader.endArray();
-            }*/
         }
         reader.endObject();
 
@@ -139,49 +128,6 @@ public class PinRetrieval extends AsyncTask<String, Void, String> {
                 new LatLng(latitude, longitude), title, dateCreated, dateModified, mapsActivity);
         else
             return null;
-        //newPin.setPinDescriptions(descriptions);
-    }
-
-    public Description[] readDescriptionArray(JsonReader reader) throws IOException {
-        ArrayList<Description> descriptions = new ArrayList<Description>();
-
-        reader.beginArray();
-        while (reader.hasNext()) {
-            descriptions.add(readDescription(reader));
-        }
-        reader.endArray();
-        return (Description[]) descriptions.toArray();
-    }
-
-    public Description readDescription(JsonReader reader) throws IOException {
-        int descriptionId = -1;
-        int userId = -1;
-        int pinId = -1;
-        String text = null;
-        String createdAt = null;
-        String modifiedAt = null;
-
-        reader.beginObject();
-        while (reader.hasNext()) {
-            String name = reader.nextName();
-            if (name.equals("descriptionId")) {
-                descriptionId = reader.nextInt();
-            } else if (name.equals("userId")) {
-                userId = reader.nextInt();
-            } else if (name.equals("pinId")) {
-                pinId = reader.nextInt();
-            } else if (name.equals("text")) {
-                text = reader.nextString();
-            } else if (name.equals("dateCreated")) {
-                createdAt = reader.nextString();
-            } else if (name.equals("dateModified")) {
-                modifiedAt = reader.nextString();
-            }
-        }
-        reader.endObject();
-
-        return new Description(descriptionId, userId, pinId,
-                text, createdAt, modifiedAt, mapsActivity);
     }
 
     private String get(URL url) throws IOException {

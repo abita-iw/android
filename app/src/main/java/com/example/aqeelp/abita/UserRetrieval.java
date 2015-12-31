@@ -31,18 +31,25 @@ public class UserRetrieval extends AsyncTask<String, Void, String> {
     private Description description;
     private MapsActivity activity;
     private boolean pinCalled;
+    private boolean descriptionCalled;
 
     public UserRetrieval(Pin p, Description d, MapsActivity m) {
         activity = m;
 
-        if (p != null) {
+        if (p != null && d == null) {
             pin = p;
             Log.v("Async_task", "Instantiated user retrieval for pin " + p.getPinId());
             pinCalled = true;
-        } else {
+            descriptionCalled = false;
+        } else if (d != null && p == null){
             description = d;
             Log.v("Async_task", "Instantiated user retrieval for description " + d.getDescriptionId());
             pinCalled = false;
+            descriptionCalled = true;
+        } else {
+            Log.v("Async_task", "Getting global user");
+            pinCalled = false;
+            descriptionCalled = false;
         }
 
         trustEveryone();
@@ -60,15 +67,17 @@ public class UserRetrieval extends AsyncTask<String, Void, String> {
     }
 
     protected void onPostExecute(String data) {
-        Log.v("Async_task", "On Post Execute - Attempting to create pins from data");
+        Log.v("Async_task", "On Post Execute - Attempting to create User from data");
         Log.v("Async_task", data);
         try {
             InputStream stream = new ByteArrayInputStream(data.getBytes("UTF-8"));
             User userReceived = readJsonStream(stream);
             if (pinCalled)
                 pin.setPinUser(userReceived);
-            else
+            else if (descriptionCalled)
                 description.setDescriptionUser(userReceived);
+            else
+                activity.setCurrentUser(userReceived);
             activity.addNewUser(userReceived);
         } catch (IOException e) {
             Log.v("Async_task", "On Post Execute - Failed to parse JSON properly");
