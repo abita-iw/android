@@ -26,33 +26,20 @@ import javax.net.ssl.X509TrustManager;
 /**
  * Created by aqeelp on 12/28/15.
  */
-public class PinPost extends AsyncTask<String, Void, String> {
-    final private String[] PINTYPESTRINGS = { "Wildlife", "Foliage", "Scenery", "Architecture" };
-    final private ArrayList<String> PINTYPES =
-            new ArrayList<String>(Arrays.asList(PINTYPESTRINGS));
+public class DescriptionPost extends AsyncTask<String, Void, String> {
     JSONObject json;
-    String newPinType;
-    int newPinTypeIndex;
-    LatLng location;
-    String newPinTitle;
-    String newPinCaption;
-    Bitmap picture;
-    MapsActivity CONTEXT;
+    Pin pin;
+    String text;
 
-    public PinPost(String npt, int npti, LatLng loc, String nptit, String npc, Bitmap pic, MapsActivity c) {
-        newPinType = npt;
-        newPinTypeIndex = npti;
-        location = loc;
-        newPinTitle = nptit;
-        newPinCaption = npc;
-        picture = pic;
-        CONTEXT = c;
+    public DescriptionPost(Pin p, String t) {
+        pin = p;
+        text = t;
 
         trustEveryone();
 
         // Create the JSON object for this pin
-        json = makePinJSON();
-        Log.v("PinPost", "Pin JSON constructed");
+        json = makeDescriptionJSON();
+        Log.v("DescriptionPost", "Description JSON constructed");
         if (json == null) return;
     }
 
@@ -60,7 +47,7 @@ public class PinPost extends AsyncTask<String, Void, String> {
         // Issue post request
         try {
 
-            Log.v("PinPost", "Issuing pin post request...");
+            Log.v("DescriptionPost", "Issuing description post request...");
 
             ByteArrayOutputStream result = new ByteArrayOutputStream();
             HttpRequest.post(params[0])
@@ -68,71 +55,50 @@ public class PinPost extends AsyncTask<String, Void, String> {
                     .send(json.toString())
                     .receive(result);
 
-            Log.v("PinPost", "Completed.");
+            Log.v("DescriptionPost", "Completed.");
             return result.toString();
 
         } catch (HttpRequest.HttpRequestException e) {
-            Log.v("PinPost", "Exception: " + e.toString());
+            Log.v("DescriptionPost", "Exception: " + e.toString());
         }
         return null;
     }
 
     protected void onPostExecute(String response) {
-        Log.v("PinPost", "Response received: " + response);
+        Log.v("DescriptionPost", "Response received: " + response);
 
         try {
-            JSONObject newPinReceivedJSON = new JSONObject(response);
+            JSONObject receivedJSON = new JSONObject(response);
 
-            Pin pin = new Pin(newPinReceivedJSON.getInt("pinId"),
-                    newPinReceivedJSON.getInt("userId"),
-                    newPinReceivedJSON.getString("pinType"),
-                    new LatLng(newPinReceivedJSON.getDouble("latitude"), newPinReceivedJSON.getDouble("longitude")),
-                    newPinReceivedJSON.getString("title"),
-                    newPinReceivedJSON.getString("dateCreated"),
-                    newPinReceivedJSON.getString("dateModified"),
-                    CONTEXT);
+            Description description = new Description(receivedJSON.getInt("descriptionId"),
+                    receivedJSON.getInt("userId"),
+                    receivedJSON.getInt("pinId"),
+                    receivedJSON.getString("text"),
+                    receivedJSON.getString("dateCreated"),
+                    receivedJSON.getString("dateModified"),
+                    pin.getParent());
 
-            // Set and upload image (if necessary)
-            if (picture != null) {
-                // TODO: upload image
-                pin.setThumbnail(picture);
-                PicturePost uploadPicture = new PicturePost(pin, picture);
-                uploadPicture.execute("https://www.abitatech.net:5000/api/pictures");
-            }
+            Description[] descriptions = new Description[1];
+            descriptions[0] = description;
+            pin.setPinDescriptions(descriptions);
 
-            Log.v("PinPost", "Found a thumbnail and set it");
-
-            // Set and upload caption (if necessary)
-            if (newPinCaption != null) {
-                DescriptionPost makeDescription = new DescriptionPost(pin, newPinCaption);
-                makeDescription.execute("https://www.abitatech.net:5000/api/descriptions");
-            }
-
-            Log.v("PinPost", "Made descriptions and added them");
-
-            CONTEXT.addNewPin(pin);
-
-            Log.v("PinPost", "Pin creation complete");
-
-            Toast.makeText(pin.getParent(), "Pin posted to database", Toast.LENGTH_LONG);
+            Log.v("DescriptionPost", "Made description and added it");
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    private JSONObject makePinJSON() {
+    private JSONObject makeDescriptionJSON() {
         JSONObject pinJSON = new JSONObject();
 
         try {
             pinJSON.put("userId", 18); // TODO: global user
-            pinJSON.put("typeId", newPinTypeIndex + 1);
-            pinJSON.put("latitude", location.latitude);
-            pinJSON.put("longitude", location.longitude);
-            pinJSON.put("title", newPinTitle);
+            pinJSON.put("pinId", pin.getPinId());
+            pinJSON.put("text", text);
 
             return pinJSON;
         } catch (JSONException e) {
-            Log.v("PinPost", "JSON Exception");
+            Log.v("DescriptionPost", "JSON Exception");
         }
 
         return null;
