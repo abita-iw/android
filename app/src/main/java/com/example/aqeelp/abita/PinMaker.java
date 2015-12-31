@@ -91,7 +91,7 @@ public class PinMaker {
                             newPinType = "Foliage";
                             break;
                         case 2:
-                            newPinType = "Scenery";
+                            newPinType = "Landscape";
                             break;
                         case 3:
                             newPinType = "Architecture";

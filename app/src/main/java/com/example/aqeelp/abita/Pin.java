@@ -29,7 +29,7 @@ import java.util.Arrays;
  * Created by aqeelp on 10/24/15.
  */
 public class Pin {
-    final private String[] PINTYPESTRINGS = { "Wildlife", "Foliage", "Scenery", "Architecture" };
+    final private String[] PINTYPESTRINGS = { "Wildlife", "Foliage", "Landscape", "Architecture" };
     final private ArrayList<String> PINTYPES =
             new ArrayList<String>(Arrays.asList(PINTYPESTRINGS));
     final private int[] PINCOLORS = { Color.parseColor("#fffbbc05"),
@@ -264,44 +264,37 @@ public class Pin {
                     Log.v("PinDisplay", "image set");
                 }
 
+                // Set pin display colors
                 View header = dialog.findViewById(R.id.PinInfoHeader);
                 View readMore = dialog.findViewById(R.id.PinInfoReadMore);
                 header.setBackgroundColor(PINCOLORS[pin.getPinTypeIndex()]);
                 readMore.setBackgroundColor(PINCOLORS[pin.getPinTypeIndex()]);
                 Log.v("PinDisplay", "colors set");
 
-                //TODO: fill section with descriptions
+                // Fill descriptions
                 LinearLayout descriptionSection = (LinearLayout)
                         dialog.findViewById(R.id.pin_description_section);
                 Description[] descriptions = pin.getPinDescriptions();
-                Log.v("PinDisplay", "descriptions being set...");
-                for (int i = 0; i < descriptions.length; i++) {
-                    /*
-                    TextView username = new TextView(pin.getParent());
-                    username.setText(descriptions[i].getUser().getDisplayName() + " says...");
-                    // username.setTextSize(15.0f);
-                    descriptionSection.addView(username,
-                            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                                    LinearLayout.LayoutParams.WRAP_CONTENT));
 
-                    TextView content = new TextView(pin.getParent());
-                    Log.v("Pin", descriptions[i].getDescriptionId() + " " + descriptions[i].getText());
-                    content.setText(descriptions[i].getText());
-                    // content.setTextSize(20.0f);
-                    descriptionSection.addView(content,
-                            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                                    LinearLayout.LayoutParams.WRAP_CONTENT)); */
+                Log.v("PinDisplay", "descriptions being set if necessary...");
+                if (descriptions != null) {
+                    for (int i = 0; i < descriptions.length; i++) {
+                        Log.v("PinDisplay", "chill");
+                        Context context = pin.getParent();
+                        DescriptionView descriptionView = new DescriptionView(context, descriptions[i]);
+                        Log.v("PinDisplay", "cool");
+                        descriptionSection.addView(descriptionView.getView());
+                        Log.v("PinDisplay", "sick");
 
-                    Context context = pin.getParent();
-                    DescriptionView descriptionView = new DescriptionView(context, descriptions[i]);
-                    descriptionSection.addView(descriptionView.getView());
-
-                    if (descriptions.length - i > 1) {
-                        View horizontalLine = new View(pin.getParent());
-                        horizontalLine.setBackgroundColor(0xFF999999);
-                        horizontalLine.setPadding(10, 10, 10, 10);
-                        descriptionSection.addView(horizontalLine,
-                                new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 3));
+                        if (descriptions.length - i > 1) {
+                            View horizontalLine = new View(pin.getParent());
+                            Log.v("PinDisplay", "nice");
+                            horizontalLine.setBackgroundColor(0xFF999999);
+                            horizontalLine.setPadding(10, 10, 10, 10);
+                            descriptionSection.addView(horizontalLine,
+                                    new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 3));
+                            Log.v("PinDisplay", "tight");
+                        }
                     }
                 }
 

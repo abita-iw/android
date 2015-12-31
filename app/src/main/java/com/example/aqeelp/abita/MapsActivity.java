@@ -59,7 +59,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private User currentUser;
 
-    private String PinTypes[] = { "Wildlife", "Foliage", "Scenery", "Landmark" };
+    private String PinTypes[] = { "Wildlife", "Foliage", "Landscape", "Landmark" };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -305,30 +305,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         pin.show(mMap);
     }
 
-    public void setCurrentUser(User user) {
-        currentUser = user;
-        addNewUser(user);
-        Log.v("Main", "Current user is id #" + currentUser.getUserId());
-
-        this.findViewById(R.id.image_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                camera = new Camera(getThisActivity());
-            }
-        });
-
-        this.findViewById(R.id.pin_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PinMaker.makePin(MapsActivity.this, lastKnownLoc);
-            }
-        });
-    }
-
-    public User getCurrentUser() {
-        return currentUser;
-    }
-
     // Accessor and setter methods for Pin and User SparseArrays:
     public void addNewPins(List<Pin> pins) {
         for (Pin pin : pins) {
@@ -358,6 +334,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public User findUserById(int userId) {
         return users.get(userId);
+    }
+
+    public void setCurrentUser(User user) {
+        currentUser = user;
+        addNewUser(user);
+        Log.v("Main", "Current user is id #" + currentUser.getUserId());
+
+        this.findViewById(R.id.image_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                camera = new Camera(getThisActivity());
+            }
+        });
+
+        this.findViewById(R.id.pin_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PinMaker.makePin(MapsActivity.this, lastKnownLoc);
+            }
+        });
+    }
+
+    public User getCurrentUser() {
+        return currentUser;
     }
 
     @Override
