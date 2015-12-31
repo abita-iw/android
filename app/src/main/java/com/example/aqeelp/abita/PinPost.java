@@ -1,24 +1,16 @@
 package com.example.aqeelp.abita;
 
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
+
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
+import java.io.ByteArrayOutputStream;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -34,92 +26,111 @@ import javax.net.ssl.X509TrustManager;
 /**
  * Created by aqeelp on 12/28/15.
  */
-public class PinPost extends AsyncTask<String, Void, Integer> {
+public class PinPost extends AsyncTask<String, Void, String> {
     final private String[] PINTYPESTRINGS = { "Wildlife", "Foliage", "Scenery", "Architecture" };
     final private ArrayList<String> PINTYPES =
             new ArrayList<String>(Arrays.asList(PINTYPESTRINGS));
     JSONObject json;
-    Pin pin;
+    String newPinType;
+    int newPinTypeIndex;
+    LatLng location;
+    String newPinTitle;
+    String newPinCaption;
+    Bitmap preview;
+    MapsActivity CONTEXT;
 
-    public PinPost(Pin p) {
-        pin = p;
+    public PinPost(String npt, int npti, LatLng loc, String nptit, String npc, Bitmap prev, MapsActivity c) {
+        newPinType = npt;
+        newPinTypeIndex = npti;
+        location = loc;
+        newPinTitle = nptit;
+        newPinCaption = npc;
+        preview = prev;
+        CONTEXT = c;
 
         trustEveryone();
 
         // Create the JSON object for this pin
-        json = makePinJSON(pin);
+        json = makePinJSON();
         Log.v("PinPost", "Pin JSON constructed");
         if (json == null) return;
     }
 
-    protected Integer doInBackground(String... params) {
+    protected String doInBackground(String... params) {
         // Issue post request
-        int response = -1;
         try {
 
-            Log.v("PinPost", "Issuing request...");
-            //Log.v("PinPost", URLEncoder.encode(json.toString(), "UTF-8"));
-            //response = HttpRequest.post(params[0])
-             //       .send(URLEncoder.encode(json.toString(), "UTF-8")).code();
+            Log.v("PinPost", "Issuing pin post request...");
 
-            // TODO String sendString = "userId=" + pin.getUserId();
-            String sendString = "userId=" + 18;
-            sendString += "&typeId=" + PINTYPES.indexOf(pin.getPinType());
-            sendString += "&latitude=" + pin.getPinLocation().latitude;
-            sendString += "&longitude=" + pin.getPinLocation().longitude;
-            sendString += "&title=\"" + pin.getPinTitle() + "\"";
+            ByteArrayOutputStream result = new ByteArrayOutputStream();
+            HttpRequest.post(params[0])
+                    .contentType(HttpRequest.CONTENT_TYPE_JSON)
+                    .send(json.toString())
+                    .receive(result);
 
-            Log.v("PinPost", sendString);
-
-            response = HttpRequest.post(params[0]).send(sendString).code();
             Log.v("PinPost", "Completed.");
-            return response;
+            return result.toString();
 
-        } catch (Exception e) {
-
+        } catch (HttpRequest.HttpRequestException e) {
+            Log.v("PinPost", "Exception: " + e.toString());
         }
-        return response;
-
-        /*try {
-            // Setup connection
-            URL url = new URL("https://api.abitatech.net:5000/api/pins");
-            URLConnection urlConnection = url.openConnection();
-            urlConnection.setDoInput(true);
-            urlConnection.setDoOutput(true);
-            Log.v("PinPost", "URL opened");
-
-            // Send POST output
-            OutputStream out = new BufferedOutputStream(urlConnection.getOutputStream());
-            //OutputStreamWriter writer = new OutputStreamWriter(out, "UTF-8");
-            Log.v("PinPost", "Writer init'd");
-            byte[] jsonString = URLEncoder.encode(json.toString(), "UTF-8").getBytes();
-            Log.v("PinPost", "Created byte stream");
-            out.write(jsonString, 0, jsonString.length);
-            Log.v("PinPost", "Written");
-
-            out.flush();
-            out.close();
-            Log.v("PinPost", "Flushed and closed");
-        } catch (MalformedURLException e) {
-            Log.v("PinPost", "Malformed URL Exception");
-        } catch (IOException e) {
-            Log.v("PinPost", "IO Exception");
-        }*/
+        return null;
     }
 
-    protected void onPostExecute(Integer response) {
+    protected void onPostExecute(String response) {
         Log.v("PinPost", "Response received: " + response);
+
+        try {
+            JSONObject newPinReceivedJSON = new JSONObject(response);
+
+            Pin pin = new Pin(newPinReceivedJSON.getInt("pinId"),
+                    newPinReceivedJSON.getInt("userId"),
+                    newPinReceivedJSON.getString("pinType"),
+                    new LatLng(newPinReceivedJSON.getDouble("latitude"), newPinReceivedJSON.getDouble("longitude")),
+                    newPinReceivedJSON.getString("title"),
+                    newPinReceivedJSON.getString("dateCreated"),
+                    newPinReceivedJSON.getString("dateModified"),
+                    CONTEXT);
+
+            // Set and upload image (if necessary)
+            if (preview != null) {
+                // TODO: upload image
+                pin.setThumbnail(preview);
+            }
+
+            Log.v("PinPost", "Found a thumbnail and set it");
+
+            // Set and upload caption (if necessary)
+            if (newPinCaption != null) {
+                Description description = new Description(pin.getPinId(), 18, pin.getPinId(),
+                        newPinCaption, "", "", CONTEXT);
+                Description[] descriptions = new Description[1];
+                descriptions[0] = description;
+                pin.setPinDescriptions(descriptions);
+                // TODO upload description
+            }
+
+            Log.v("PinPost", "Made descriptions and added them");
+
+            CONTEXT.addNewPin(pin);
+
+            Log.v("PinPost", "Pin creation complete");
+
+            Toast.makeText(pin.getParent(), "Pin posted to database", Toast.LENGTH_LONG);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
-    private JSONObject makePinJSON(Pin pin) {
+    private JSONObject makePinJSON() {
         JSONObject pinJSON = new JSONObject();
 
         try {
-            pinJSON.put("userId", 18); // TODO: dynamic user
-            pinJSON.put("typeId", PINTYPES.indexOf(pin.getPinType()));
-            pinJSON.put("latitude", pin.getPinLocation().latitude);
-            pinJSON.put("longitude", pin.getPinLocation().longitude);
-            pinJSON.put("title", pin.getPinTitle());
+            pinJSON.put("userId", 18); // TODO: global user
+            pinJSON.put("typeId", newPinTypeIndex + 1);
+            pinJSON.put("latitude", location.latitude);
+            pinJSON.put("longitude", location.longitude);
+            pinJSON.put("title", newPinTitle);
 
             return pinJSON;
         } catch (JSONException e) {

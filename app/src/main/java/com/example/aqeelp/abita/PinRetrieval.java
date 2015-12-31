@@ -136,7 +136,7 @@ public class PinRetrieval extends AsyncTask<String, Void, String> {
 
         if (mapsActivity.findPinById(pinId) == null)
             return new Pin(pinId, userId, pinType,
-                new LatLng(latitude, longitude), title, mapsActivity);
+                new LatLng(latitude, longitude), title, dateCreated, dateModified, mapsActivity);
         else
             return null;
         //newPin.setPinDescriptions(descriptions);

@@ -44,6 +44,8 @@ public class Pin {
     final private LatLng pinLocation;
     final private String pinTitle;
     final private MapsActivity parent;
+    final private String createdAt;
+    final private String modifiedAt;
 
     // Attributes changed as needed:
     private boolean inRange;
@@ -58,13 +60,15 @@ public class Pin {
      * - get full bitmap when in close enough range to
      */
 
-    public Pin(int pid, int uid, String ptype, LatLng loc, String ti, MapsActivity p) {
+    public Pin(int pid, int uid, String ptype, LatLng loc, String ti, String ca, String ma, MapsActivity p) {
         pinId = pid;
         userId = uid;
         pinType = ptype;
         pinTypeIndex = PINTYPES.indexOf(pinType);
         pinLocation = loc;
         pinTitle = ti;
+        createdAt = ca;
+        modifiedAt = ma;
         parent = p;
 
         inRange = true;

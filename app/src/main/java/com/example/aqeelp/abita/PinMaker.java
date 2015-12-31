@@ -55,40 +55,11 @@ public class PinMaker {
 
     private static void generatePin() {
         if (newPinType != null && newPinTitle != null && newPinCaption != null) {
-            // Create local Pin
-            // TODO: Pin ID has to come from the post
-            Pin pin = new Pin(1, 18, newPinType, location,
-                    newPinTitle, parent);
-
             // Upload the pin:
             Log.v("PinPost", "Starting pin post");
-            // TODO PinPost poster = new PinPost(pin);
-            // TODO poster.execute("https://api.abitatech.net:5000/api/pins");
+            PinPost poster = new PinPost(newPinType, newPinTypeIndex, location, newPinTitle, newPinCaption, preview, parent);
+            poster.execute("https://www.abitatech.net:5000/api/pins/");
             Log.v("PinPost", "Pin posted, added to parent");
-
-            // Set and upload image (if necessary)
-            if (preview != null) {
-                // TODO: upload image
-                pin.setThumbnail(preview);
-            }
-
-            Log.v("PinPost", "Found a thumbnail and set it");
-
-            // Set and upload caption (if necessary)
-            if (newPinCaption != null) {
-                Description description = new Description(1, 18, pin.getPinId(),
-                        newPinCaption, "", "", parent);
-                Description[] descriptions = new Description[1];
-                descriptions[0] = description;
-                pin.setPinDescriptions(descriptions);
-                // TODO upload description
-            }
-
-            Log.v("PinPost", "Made descriptions and added them");
-
-            parent.addNewPin(pin);
-
-            Log.v("PinPost", "Pin creation complete");
         }
     }
 
